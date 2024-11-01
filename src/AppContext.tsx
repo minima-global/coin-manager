@@ -21,8 +21,8 @@ const AppProvider = ({ children }: IProps) => {
     if (!loaded.current) {
       loaded.current = true
 
-      MDS.init(async (test) => {
-        if (test.event === "inited") {
+      MDS.init(async ({ event }) => {
+        if (event === "inited") {
           setIsInited(true)
           MDS.log("MDS INITED AND READY 🚀")
         }

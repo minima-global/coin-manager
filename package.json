@@ -18,7 +18,7 @@
     "@chakra-ui/react": "^3.0.2",
     "@emotion/react": "^11.13.3",
     "@hookform/resolvers": "^3.9.1",
-    "@minima-global/mds": "0.13.2",
+    "@minima-global/mds": "0.13.3",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-icons": "^1.3.0",
@@ -46,9 +46,11 @@
     "tailwindcss": "^3.3.5",
     "tailwindcss-animate": "^1.0.7",
     "vite-plugin-html": "^3.2.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@chakra-ui/cli": "^3.0.2",
     "@tanstack/router-devtools": "^1.70.0",
     "@tanstack/router-plugin": "^1.69.1",
     "@types/react": "^18.2.15",

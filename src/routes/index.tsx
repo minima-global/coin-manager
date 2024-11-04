@@ -39,7 +39,7 @@ export default function TokenManager() {
             <div>
               <p className="text-white text-lg font-semibold">Total Balance</p>
               <p className="text-white text-3xl font-bold transition-all duration-500 ease-in-out">
-                100
+                {balance?.response[0].total}
               </p>
             </div>
           </div>
@@ -71,7 +71,11 @@ export default function TokenManager() {
             </div>
             <div className="flex items-center space-x-4">
               <p className="font-medium">
-                {Number(token.confirmed).toFixed(2)}
+                {token.confirmed.includes(".")
+                  ? token.confirmed.split(".")[0] +
+                    "." +
+                    token.confirmed.split(".")[1].slice(0, 2)
+                  : token.confirmed}
               </p>
               <Button variant="outline" size="sm" onClick={() => {}}>
                 Manage

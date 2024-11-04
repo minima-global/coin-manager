@@ -13,7 +13,10 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ConsolidateForm } from "@/components/tokens/consolidate-form"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { checkConsolidation } from "@/lib/minima/mds-functions"
+import {
+  checkConsolidation,
+  getConsolidationPreview,
+} from "@/lib/minima/mds-functions"
 import { SendResponse } from "@minima-global/mds"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -73,7 +76,6 @@ export function ConsolidationDialog({ disabled }: ConsolidationDialogProps) {
     mutationFn: (values: ConsolidationFormValues) => checkConsolidation(values),
     onSuccess: async (responseData) => {
       await new Promise((resolve) => setTimeout(resolve, 5000))
-
       setConsolidationData(responseData.data)
       queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
       queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
@@ -280,6 +282,145 @@ export function ConsolidationDialog({ disabled }: ConsolidationDialogProps) {
             )}
           </AnimatePresence>
         </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+interface ManualConsolidationDialogProps {
+  coinIds: string[]
+  onConsolidate?: () => void
+}
+
+export function ManualConsolidationDialog({
+  coinIds,
+  onConsolidate,
+}: ManualConsolidationDialogProps) {
+  const queryClient = useQueryClient()
+  const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
+  const [consolidationData, setConsolidationData] = useState<
+    SendResponse | undefined
+  >()
+  const [open, setOpen] = useState(false)
+
+  const { mutate, isPending, isSuccess } = useMutation({
+    mutationFn: (coinIds: string[]) => getConsolidationPreview(coinIds),
+    onSuccess: async (responseData) => {
+      setConsolidationData(responseData.data)
+      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
+    },
+  })
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size={"sm"} onClick={() => mutate(coinIds)}>
+          Consolidate
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Consolidate</DialogTitle>
+          <DialogDescription>Preview</DialogDescription>
+        </DialogHeader>
+        <AnimatePresence mode="wait">
+          {isPending && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex flex-col items-center justify-center py-8"
+            >
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Consolidating...
+              </p>
+            </motion.div>
+          )}
+
+          {isSuccess && consolidationData && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-start justify-start py-8 pt-2"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15,
+                }}
+                className="flex flex-col items-start justify-start gap-2 mt-2"
+              >
+                <p className="text-sm truncate text-muted-foreground max-w-md ">
+                  <span className="font-medium dark:bg-[#18181b] bg-[#dcfce7] text-[#116932] py-[2px] px-1 mr-1 text-xs">
+                    TxPow ID:{" "}
+                  </span>
+                  {consolidationData?.response.txpowid}
+                </p>
+                <p className="text-sm truncate text-muted-foreground max-w-md ">
+                  <span className="font-medium dark:bg-[#18181b] bg-[#dcfce7] text-[#116932] py-[2px] px-1 mr-1 text-xs">
+                    Size:
+                  </span>
+                  {consolidationData?.response.size} bytes
+                </p>
+
+                <h3 className="text-sm font-medium my-2">Coins</h3>
+
+                <div className="flex flex-col gap-2">
+                  {consolidationData?.response.body.txn.outputs.map((coin) => (
+                    <div key={coin.coinid} className="flex flex-col gap-1">
+                      <p className="text-sm truncate text-muted-foreground max-w-md ">
+                        <span className="font-medium dark:bg-[#18181b] bg-[#dcfce7] text-[#116932] py-[2px] px-1 mr-1 text-xs">
+                          Coin ID:
+                        </span>
+                        {coin.coinid}
+                      </p>
+                      <p className="text-sm truncate text-muted-foreground max-w-md ">
+                        <span className="font-medium dark:bg-[#18181b] bg-[#dcfce7] text-[#116932] py-[2px] px-1 mr-1 text-xs">
+                          Amount:
+                        </span>
+                        {
+                          /** @ts-ignore */
+                          // TODO: fix this in mds package
+                          coin.tokenamount
+                        }
+                      </p>
+                      <p className="text-sm truncate text-muted-foreground max-w-md ">
+                        <span className="font-medium dark:bg-[#18181b] bg-[#dcfce7] text-[#116932] py-[2px] px-1 mr-1 text-xs">
+                          Created:
+                        </span>
+                        {coin.created}
+                      </p>
+                      <div className="h-[1px] w-full bg-muted-foreground/20 my-2" />
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size={"sm"}
+                  className="w-full"
+                  onClick={() => {
+                    setOpen(false)
+                    onConsolidate?.()
+                  }}
+                >
+                  Close
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   )

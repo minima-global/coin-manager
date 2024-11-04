@@ -90,7 +90,109 @@ async function balanceByTokenId(tokenId: string): Promise<Balance.Balance> {
   return balance
 }
 
+async function getConsolidationPreview(coinIds: string[]): Promise<any> {
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+
+  const TXN_ID = "manual-consolidation"
+  let totalAmount: number = 0
+
+  // make sure there are coins to add
+  if (coinIds.length === 0) {
+    return Failure("No coins to consolidate", "consolidation_error")
+  }
+
+  // Create the txn
+  await MDS.cmd.txncreate({
+    params: {
+      id: TXN_ID,
+    },
+  })
+
+  // get the total amount of the coins and add them to the txn
+  for (const coinId of coinIds) {
+    const coinAmount = await MDS.cmd.coins({ params: { coinid: coinId } })
+
+    if (coinAmount.error) {
+      return Failure("Error getting coin", "consolidation_error")
+    }
+
+    totalAmount += parseFloat(coinAmount.response[0].tokenamount)
+
+    const input = await MDS.cmd.txninput({
+      params: {
+        id: TXN_ID,
+        coinid: coinId,
+      },
+    })
+
+    if (input.error) {
+      return Failure("Error adding coin to txn", "consolidation_error")
+    }
+  }
+
+  // get an address from the coin
+  const coin = await MDS.cmd.coins({ params: { coinid: coinIds[0] } })
+
+  if (coin.error) {
+    return Failure("Error getting coin", "consolidation_error")
+  }
+
+  const address = coin.response[0].address
+
+  // check the address
+  let MxAddress: string
+
+  const miniAddress = await MDS.cmd.checkaddress({ params: { address } })
+
+  if (miniAddress.error) {
+    return Failure("Error checking address", "consolidation_error")
+  }
+
+  MxAddress = miniAddress.response.Mx
+
+  // create the output
+  const output = await MDS.cmd.txnoutput({
+    params: {
+      address: MxAddress,
+      amount: totalAmount.toString(),
+      id: TXN_ID,
+      tokenid: coin.response[0].tokenid,
+    },
+  })
+
+  if (output.error) {
+    return Failure("Error adding output", "consolidation_error")
+  }
+
+  // sign the txn
+  const post = await MDS.cmd.txnsign({
+    params: {
+      id: TXN_ID,
+      publickey: "auto",
+    },
+  })
+
+  if (post.error) {
+    return Failure("Error", "consolidation_error")
+  }
+
+  // post the txn
+  const postResult = await MDS.cmd.txnpost({
+    params: {
+      id: TXN_ID,
+      auto: "true",
+      txndelete: "true",
+    },
+  })
+
+  console.log("Actual size", postResult.response.size)
+
+  // return the result
+  return Success(postResult)
+}
+
 export {
+  getConsolidationPreview,
   getBalance,
   getCoins,
   getCoinsByTokenId,

@@ -199,6 +199,10 @@ const Consolidate = ({ coins, disabled }: ConsolidateProps) => {
     )
   }
 
+  const closeActionBar = () => {
+    setSelectedTokens([])
+  }
+
   return (
     <div className="container mx-auto  max-w-2xl flex flex-col gap-4 pb-20">
       <div className="flex flex-col gap-1 ">
@@ -235,6 +239,10 @@ const Consolidate = ({ coins, disabled }: ConsolidateProps) => {
           isSelected={selectedTokens.includes(coin.coinid)}
           onSelect={handleTokenSelect}
           disabled={disabled}
+          selectedCount={selectedTokens.length}
+          selectedCoinIds={selectedTokens}
+          closeActionBar={closeActionBar}
+          setSelectedTokens={setSelectedTokens}
         />
       ))}
     </div>

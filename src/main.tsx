@@ -11,6 +11,8 @@ import {
   RouterProvider,
 } from "@tanstack/react-router"
 import { ThemeProvider } from "./components/theme-provider.tsx"
+import { ChakraProvider } from "@chakra-ui/react"
+import { createSystem, defaultConfig } from "@chakra-ui/react"
 
 // Debug mode
 if (import.meta.env.MODE === "development") {
@@ -31,16 +33,35 @@ declare module "@tanstack/react-router" {
   }
 }
 
+export const system = createSystem(defaultConfig, {
+  theme: {
+    tokens: {
+      fonts: {
+        heading: { value: "var(--font-inter)" },
+        body: { value: "var(--font-inter)" },
+      },
+    },
+  },
+  globalCss: {
+    ":root": {
+      "--header-height": { base: "64px", md: "104px" },
+      "--content-height": "calc(100dvh - var(--header-height))",
+    },
+  },
+})
+
 const client = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <QueryClientProvider client={client}>
-        <AppProvider>
-          <RouterProvider router={router} />
-        </AppProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ChakraProvider value={system}>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <QueryClientProvider client={client}>
+          <AppProvider>
+            <RouterProvider router={router} />
+          </AppProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ChakraProvider>
   </React.StrictMode>
 )

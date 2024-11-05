@@ -298,6 +298,7 @@ export function ManualConsolidationDialog({
 }: ManualConsolidationDialogProps) {
   const queryClient = useQueryClient()
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
+
   const [consolidationData, setConsolidationData] = useState<
     SendResponse | undefined
   >()
@@ -306,10 +307,15 @@ export function ManualConsolidationDialog({
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: (coinIds: string[]) => getConsolidationPreview(coinIds),
     onSuccess: async (responseData) => {
-      setConsolidationData(responseData.data)
-      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      setConsolidationData(responseData)
+      await queryClient.invalidateQueries({
+        queryKey: ["coinsByTokenId", tokenId],
+      })
+      await queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["balanceByTokenId", tokenId],
+      })
     },
   })
 

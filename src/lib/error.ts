@@ -1,4 +1,7 @@
-export type MDSErrorTags = "consolidation_error" | "txpow_to_big"
+export type MDSErrorTags =
+  | "consolidation_error"
+  | "txpow_to_big"
+  | "split_error"
 
 export const DEFAULT_ERROR_TAG = "server_error"
 
@@ -6,13 +9,13 @@ type DefaultErrorTag = typeof DEFAULT_ERROR_TAG
 
 export type AllErrorTags = MDSErrorTags | DefaultErrorTag
 
-interface Failure<E> {
+export interface Failure<E> {
   success: false
   error: E
   code: AllErrorTags
 }
 
-interface Success<T> {
+export interface Success<T> {
   success: true
   data: T
 }

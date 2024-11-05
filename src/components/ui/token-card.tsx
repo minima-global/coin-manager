@@ -304,7 +304,7 @@ export const CoinCard = ({
   return (
     <>
       <div
-        className={`flex flex-col bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md cursor-pointer ${
+        className={`flex flex-col bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md cursor-pointer dark:shadow-muted ${
           disabled ? "opacity-50" : ""
         }`}
         onClick={handleCardClick}
@@ -347,7 +347,14 @@ export const CoinCard = ({
           </div>
           <div className="flex items-center gap-2">
             <p className="font-medium text-xs">
-              Amount: {Number(coin.tokenamount).toFixed(2)}
+              Amount:{" "}
+              {coin.tokenamount
+                ? Number(coin.tokenamount).toFixed(2)
+                : coin.amount.includes(".")
+                  ? coin.amount.split(".")[0] +
+                    "." +
+                    coin.amount.split(".")[1].slice(0, 2)
+                  : coin.amount}
             </p>
             <Button
               type="button"
@@ -434,5 +441,217 @@ export const CoinCard = ({
         </ActionBarContent>
       </ActionBarRoot>
     </>
+  )
+}
+
+interface MinimaTokenCardProps {
+  token: Balance.BalanceWithTokenDetails
+  type: "showcase" | "details"
+}
+export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
+  const [isCopied, setIsCopied] = useState(false)
+  const handleCopyToken = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(token, null, 2))
+      setIsCopied(true)
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 2000)
+    } catch (error) {
+      setIsCopied(false)
+    }
+  }
+
+  const cardClasses =
+    "bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md"
+
+  return (
+    <div className={cardClasses}>
+      {token.response.map((token) => {
+        if (token.tokenid !== "0x00") return null
+        return (
+          <div key={token.tokenid} className="p-4 space-y-4">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center space-x-2">
+                <Coins className="h-6 w-6 text-primary" />
+                <div>
+                  <p className="font-medium">
+                    {typeof token.token === "string"
+                      ? token.token
+                      : token.token.name || "Unknown Token"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleCopyToken}
+                      >
+                        <motion.div
+                          animate={{
+                            scale: isCopied ? [1, 1.2, 0.9, 1] : 1,
+                            rotate: isCopied ? [0, 15, -5, 0] : 0,
+                          }}
+                          transition={{
+                            duration: 0.4,
+                            ease: [0.4, 0, 0.2, 1],
+                          }}
+                        >
+                          <motion.div
+                            initial={false}
+                            animate={{
+                              opacity: isCopied ? 0 : 1,
+                              y: isCopied ? -20 : 0,
+                              position: "absolute",
+                            }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <CopyIcon className="w-4 h-4" />
+                          </motion.div>
+                          <motion.div
+                            initial={false}
+                            animate={{
+                              opacity: isCopied ? 1 : 0,
+                              y: isCopied ? 0 : 20,
+                            }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <CheckIcon className="w-4 h-4 text-emerald-500" />
+                          </motion.div>
+                        </motion.div>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Copy</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+            {type === "showcase" && (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Amount:
+                  </span>
+                  {Number(token.total).toFixed(2)}
+                </p>
+
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Description:
+                  </span>
+                  Minima Token
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+                <p className="text-sm truncate text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Token ID:
+                  </span>
+                  {token.tokenid}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Total:
+                  </span>
+                  {token.total}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+
+                <>
+                  <p className="text-sm text-muted-foreground">
+                    <span
+                      className={cn(
+                        "font-medium text-primary py-[2px] px-2 mr-1",
+                        token.unconfirmed !== "0"
+                          ? "animate-pulse bg-yellow-100 text-yellow-600"
+                          : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      )}
+                    >
+                      Total Coins:
+                    </span>
+                    {token.coins}
+                  </p>
+                  <div className="w-full h-[1px] bg-border" />
+                </>
+
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Sendable:
+                  </span>
+                  {token.sendable}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Confirmed:
+                  </span>
+                  {token.confirmed}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1",
+                      token.unconfirmed !== "0"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    )}
+                  >
+                    Unconfirmed:
+                  </span>
+                  {token.unconfirmed}
+                </p>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
   )
 }

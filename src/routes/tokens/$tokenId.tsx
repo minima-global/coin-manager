@@ -1,10 +1,15 @@
 import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog"
-import { CoinCard, TokenCard } from "@/components/ui/token-card"
+import {
+  CoinCard,
+  MinimaTokenCard,
+  TokenCard,
+} from "@/components/ui/token-card"
 import { useMinima } from "@/hooks/use-minima"
 import { CoinsResponse } from "@minima-global/mds"
 import { createFileRoute } from "@tanstack/react-router"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRef, useState } from "react"
+import { SplitDialog } from "@/components/dialogs/split-dialog"
 
 export const Route = createFileRoute("/tokens/$tokenId")({
   component: TokenComponent,
@@ -25,6 +30,52 @@ function TokenComponent() {
   >(null)
 
   if (!token || !coins) return null
+
+  if (tokenId === "0x00" && balance) {
+    return (
+      <div className="container mx-auto max-w-2xl flex flex-col gap-4">
+        <MinimaTokenCard token={balance} type="showcase" />
+        <Nav
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          setHoveredLink={setHoveredLink}
+          hoveredLink={hoveredLink}
+        />
+
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {activeTab === "consolidate" && (
+              <motion.div
+                key="consolidate"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="absolute w-full"
+              >
+                <Consolidate
+                  coins={coins}
+                  disabled={coins.response.length < 3}
+                />
+              </motion.div>
+            )}
+            {activeTab === "split" && (
+              <motion.div
+                key="split"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="absolute w-full"
+              >
+                <SplitCoins />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto max-w-2xl flex flex-col gap-4">
@@ -66,7 +117,7 @@ function TokenComponent() {
               transition={{ duration: 0.2 }}
               className="absolute w-full"
             >
-              <div>Split content here</div>
+              <SplitCoins />
             </motion.div>
           )}
         </AnimatePresence>
@@ -245,6 +296,20 @@ const Consolidate = ({ coins, disabled }: ConsolidateProps) => {
           setSelectedTokens={setSelectedTokens}
         />
       ))}
+    </div>
+  )
+}
+
+const SplitCoins = () => {
+  return (
+    <div className="container mx-auto max-w-2xl flex flex-col gap-4 pb-20">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-base">Split Coins</h1>
+        <p className="text-sm text-muted-foreground">
+          Split your coins into smaller amounts
+        </p>
+      </div>
+      <SplitDialog />
     </div>
   )
 }

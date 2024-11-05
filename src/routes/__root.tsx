@@ -7,7 +7,7 @@ export const Route = createRootRoute({
   component: () => {
     return (
       <>
-        <div className="border-b border-muted mt-4 pb-2">
+        <div className="border-b border-muted mt-4 pb-2 px-4">
           <div className="flex gap-2 container mx-auto max-w-2xl ">
             <div className="flex gap-4 relative justify-between w-full">
               <div className="flex gap-2">

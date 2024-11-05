@@ -17,7 +17,7 @@ export function useMinima() {
     queryKey: ["balance"],
     queryFn: getBalance,
     enabled: isInited,
-    refetchInterval: 10000, // 10 seconds
+    refetchInterval: 5000, // 5 seconds
   })
 
   const coins = useQuery<CoinsResponse | null>({
@@ -39,11 +39,12 @@ export function useMinima() {
       queryKey: ["token", tokenId],
       queryFn: () => getTokenById(tokenId),
       enabled: isInited,
+      refetchInterval: 5000, // 5 seconds
     })
   }
 
   const balanceByTokenIdQuery = (tokenId: string) => {
-    return useQuery<Balance.Balance | undefined>({
+    return useQuery<Balance.BalanceWithTokenDetails | undefined>({
       queryKey: ["balanceByTokenId", tokenId],
       queryFn: () => balanceByTokenId(tokenId),
       enabled: isInited,

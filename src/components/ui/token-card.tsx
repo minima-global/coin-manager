@@ -469,17 +469,19 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
     <div className={cardClasses}>
       {token.response.map((token) => {
         if (token.tokenid !== "0x00") return null
+
+        const tokenName =
+          typeof token.token === "string"
+            ? token.token
+            : token.token?.name || "Minima"
+
         return (
           <div key={token.tokenid} className="p-4 space-y-4">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-2">
                 <Coins className="h-6 w-6 text-primary" />
                 <div>
-                  <p className="font-medium">
-                    {typeof token.token === "string"
-                      ? token.token
-                      : token.token.name || "Unknown Token"}
-                  </p>
+                  <p className="font-medium">{tokenName}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">

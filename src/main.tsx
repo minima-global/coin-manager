@@ -13,6 +13,7 @@ import {
 import { ThemeProvider } from "./components/theme-provider.tsx"
 import { ChakraProvider } from "@chakra-ui/react"
 import { createSystem, defaultConfig } from "@chakra-ui/react"
+import { Toaster } from "@/components/ui/sonner"
 
 // Debug mode
 if (import.meta.env.MODE === "development") {
@@ -59,6 +60,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <QueryClientProvider client={client}>
           <AppProvider>
             <RouterProvider router={router} />
+            <Toaster />
           </AppProvider>
         </QueryClientProvider>
       </ThemeProvider>

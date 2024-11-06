@@ -10,6 +10,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRef, useState } from "react"
 import { SplitDialog } from "@/components/dialogs/split-dialog"
+import { InfoIcon } from "lucide-react"
 
 export const Route = createFileRoute("/tokens/$tokenId")({
   component: TokenComponent,
@@ -307,6 +308,10 @@ const SplitCoins = () => {
         <h1 className="text-base">Split Coins</h1>
         <p className="text-sm text-muted-foreground">
           Split your coins into smaller amounts
+        </p>
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <InfoIcon className="w-4 h-4 text-blue-700" />
+          Generating an address uses one of your 64 addresses
         </p>
       </div>
       <SplitDialog />

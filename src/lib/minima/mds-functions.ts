@@ -7,8 +7,7 @@ import {
 } from "@minima-global/mds"
 import { Failure, Success } from "../error"
 import { ConsolidationFormValues } from "@/components/dialogs/consolidation-dialog"
-import { SplitFormValues } from "@/components/tokens/split-form"
-
+import { SplitFormValues } from "@/lib/schemas"
 async function getBalance(): Promise<Balance.Balance> {
   const balance = await MDS.cmd.balance()
   return balance
@@ -170,6 +169,8 @@ async function getConsolidationPreview(coinIds: string[]): Promise<any> {
       throw new Error("Error adding output")
     }
 
+    console.log("here 1")
+
     // sign the txn
     const post = await MDS.cmd.txnsign({
       params: {
@@ -178,12 +179,24 @@ async function getConsolidationPreview(coinIds: string[]): Promise<any> {
       },
     })
 
-    if (post.error) {
+    if (post.error && !post.pending) {
       throw new Error("Error")
     }
 
+    console.log("COMMAND IS PENDING")
+    console.log(post.command)
+
+    // @ts-ignore TODO: fix this
+    const pendingId = post.pendinguid
+
+    const insert = await MDS.sql(
+      `INSERT INTO CONSOLIDATION (pending_id, txn_id) VALUES ('${pendingId}', '${TXN_ID}')`
+    )
+
+    console.log(insert)
+
     // post the txn
-    const postResult = await MDS.cmd.txnpost({
+    /* const postResult = await MDS.cmd.txnpost({
       params: {
         id: TXN_ID,
         auto: "true",
@@ -192,7 +205,7 @@ async function getConsolidationPreview(coinIds: string[]): Promise<any> {
     })
 
     // return the result
-    return postResult
+    return postResult*/
   } catch (error) {
     throw error
   }
@@ -209,7 +222,7 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
     }
 
     const MxAddress = address.response.miniaddress
-    let result
+    let result: any
 
     if (values.splitType === "perCoin") {
       const totalAmount = values.numberOfCoins * values.amountPerCoin
@@ -221,6 +234,7 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
           address: MxAddress,
         },
       })
+      return result
     } else if (values.splitType === "total") {
       result = await MDS.cmd.send({
         params: {
@@ -230,8 +244,23 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
           address: MxAddress,
         },
       })
-    } else {
-      throw new Error("Invalid split type")
+      return result
+    } else if (values.splitType === "custom") {
+      // Create multi array in format ["address:amount", "address2:amount2"]
+      const multi = values.splits.map((split) => {
+        return `${split.address}:${split.amount}`
+      })
+
+      console.log(multi)
+
+      result = await MDS.cmd.send({
+        params: {
+          split: values.splitAmount.toString(),
+          multi: JSON.stringify(multi),
+        },
+      })
+      console.log(result)
+      return result
     }
 
     if (result.error) {
@@ -244,6 +273,11 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
   }
 }
 
+async function getAddress(): Promise<any> {
+  const address = await MDS.cmd.getaddress()
+  return address
+}
+
 export {
   getConsolidationPreview,
   getBalance,
@@ -254,4 +288,5 @@ export {
   consolidateCoins,
   balanceByTokenId,
   splitCoins,
+  getAddress,
 }

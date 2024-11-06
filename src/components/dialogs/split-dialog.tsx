@@ -2,20 +2,19 @@ import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import {
-  SplitForm,
-  splitFormSchema,
-  SplitFormValues,
-} from "@/components/tokens/split-form"
+import { SplitForm } from "@/components/tokens/split-form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useParams } from "@tanstack/react-router"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { splitCoins } from "@/lib/minima/mds-functions"
+import { splitFormSchema, SplitFormValues } from "@/lib/schemas"
 
 export function SplitDialog() {
   const queryClient = useQueryClient()
-  const [splitType, setSplitType] = useState<"total" | "perCoin">("total")
+  const [splitType, setSplitType] = useState<"total" | "perCoin" | "custom">(
+    "total"
+  )
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
 
   const { mutate, isPending, isSuccess, reset } = useMutation({
@@ -39,10 +38,11 @@ export function SplitDialog() {
     resolver: zodResolver(splitFormSchema),
     defaultValues: {
       totalAmount: 0,
-      numberOfCoins: 2,
       amountPerCoin: 0,
+      numberOfCoins: 2,
+
       tokenId,
-      splitType: "total",
+      splitType: "total" as const,
     },
   })
 
@@ -50,14 +50,18 @@ export function SplitDialog() {
     mutate(values)
   }
 
-  const handleSplitTypeChange = (newType: "total" | "perCoin") => {
+  const handleSplitTypeChange = (newType: "total" | "perCoin" | "custom") => {
     setSplitType(newType)
-    form.setValue("splitType", newType)
-    if (newType === "total") {
-      form.setValue("amountPerCoin", 0)
-    } else {
-      form.setValue("totalAmount", 0)
-    }
+    form.setValue("splitType", newType as any)
+    form.reset({
+      totalAmount: 0,
+      amountPerCoin: 0,
+      numberOfCoins: 2,
+      splitAmount: 0,
+      tokenId,
+      splitType: newType as any,
+      splits: newType === "custom" ? [{ address: "", amount: 0 }] : [],
+    })
   }
 
   return (
@@ -87,6 +91,14 @@ export function SplitDialog() {
                 className="flex-1"
               >
                 Split by Amount per Coin
+              </Button>
+              <Button
+                type="button"
+                variant={splitType === "custom" ? "default" : "outline"}
+                onClick={() => handleSplitTypeChange("custom")}
+                className="flex-1"
+              >
+                Custom Split
               </Button>
             </motion.div>
 

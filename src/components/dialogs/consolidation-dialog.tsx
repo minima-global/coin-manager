@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useParams } from "@tanstack/react-router"
+import { toast } from "sonner"
 
 const consolidationFormSchema = z.object({
   minConfirmations: z.coerce
@@ -316,6 +317,7 @@ export function ManualConsolidationDialog({
       await queryClient.invalidateQueries({
         queryKey: ["balanceByTokenId", tokenId],
       })
+      toast.success("Coins consolidated successfully!")
     },
   })
 

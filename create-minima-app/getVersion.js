@@ -36,4 +36,4 @@ dappConfJson.version = version
 fs.writeFileSync(dappConfPath, JSON.stringify(dappConfJson, null, 2))
 
 // Output the version to stdout (keeping the original functionality)
-process.stdout.write(`V${version}`)
+process.stdout.write(`${version}`)

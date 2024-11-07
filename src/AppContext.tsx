@@ -25,15 +25,6 @@ const AppProvider = ({ children }: IProps) => {
         if (event === "inited") {
           setIsInited(true)
           MDS.log("MDS INITED AND READY 🚀")
-
-          const createTable = await MDS.sql(
-            "CREATE TABLE IF NOT EXISTS CONSOLIDATION (id bigint auto_increment PRIMARY KEY, pending_id varchar(256), txn_id varchar(256), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-          )
-          console.log(createTable)
-
-          const select = await MDS.sql("SELECT * FROM CONSOLIDATION")
-
-          console.log(select)
         }
       })
     }

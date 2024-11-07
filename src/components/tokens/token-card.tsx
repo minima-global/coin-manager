@@ -1,6 +1,6 @@
 import { CheckIcon, Coins, CopyIcon, ChevronDownIcon } from "lucide-react"
-import { Button } from "./button"
-import { Checkbox } from "./checkbox"
+import { Button } from "../ui/button"
+import { Checkbox } from "../ui/checkbox"
 import { Balance, Coin, Tokens } from "@minima-global/mds"
 import { Link } from "@tanstack/react-router"
 import { useState } from "react"
@@ -12,15 +12,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-
-import {
-  ActionBarCloseTrigger,
-  ActionBarContent,
-  ActionBarRoot,
-  ActionBarSelectionTrigger,
-  ActionBarSeparator,
-} from "@/components/ui/action-bar"
-import { ManualConsolidationDialog } from "../dialogs/consolidation-dialog"
 
 interface TokenCardProps {
   token: Tokens.TokenResponseSingle
@@ -119,7 +110,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -133,7 +124,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -147,7 +138,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -161,7 +152,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -177,7 +168,7 @@ export function TokenCard({
                   className={cn(
                     "font-medium text-primary py-[2px] px-2 mr-1",
                     balance?.response[0].unconfirmed !== "0"
-                      ? "animate-pulse bg-yellow-100 text-yellow-600"
+                      ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                       : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                   )}
                 >
@@ -193,7 +184,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -208,7 +199,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -222,7 +213,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -236,7 +227,7 @@ export function TokenCard({
               className={cn(
                 "font-medium text-primary py-[2px] px-2 mr-1",
                 balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600"
+                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                   : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
               )}
             >
@@ -250,7 +241,7 @@ export function TokenCard({
   )
 
   const cardClasses =
-    "bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md"
+    "bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md dark:shadow-muted"
 
   return isLinkEnabled ? (
     <Link
@@ -270,10 +261,6 @@ interface CoinCardProps {
   isSelected: boolean
   onSelect: (id: string) => void
   disabled?: boolean
-  selectedCount: number
-  selectedCoinIds: string[]
-  closeActionBar: () => void
-  setSelectedTokens: (ids: string[]) => void
 }
 
 export const CoinCard = ({
@@ -281,10 +268,6 @@ export const CoinCard = ({
   isSelected,
   onSelect,
   disabled,
-  selectedCount,
-  selectedCoinIds,
-  closeActionBar,
-  setSelectedTokens,
 }: CoinCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -295,10 +278,6 @@ export const CoinCard = ({
     ) {
       setIsExpanded(!isExpanded)
     }
-  }
-
-  const handleConsolidateClick = () => {
-    closeActionBar()
   }
 
   return (
@@ -421,25 +400,6 @@ export const CoinCard = ({
           )}
         </AnimatePresence>
       </div>
-
-      <ActionBarRoot
-        open={isSelected}
-        onOpenChange={(e) => onSelect(e.open ? coin.coinid : "")}
-        closeOnInteractOutside={false}
-      >
-        <ActionBarContent>
-          <ActionBarSelectionTrigger className="text-sm">
-            {selectedCount} Coins selected
-          </ActionBarSelectionTrigger>
-          <ActionBarSeparator />
-          <ManualConsolidationDialog
-            coinIds={selectedCoinIds}
-            onConsolidate={handleConsolidateClick}
-          />
-
-          <ActionBarCloseTrigger onClick={() => setSelectedTokens([])} />
-        </ActionBarContent>
-      </ActionBarRoot>
     </>
   )
 }
@@ -463,7 +423,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
   }
 
   const cardClasses =
-    "bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md"
+    "bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md dark:shadow-muted"
 
   return (
     <div className={cardClasses}>
@@ -471,9 +431,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
         if (token.tokenid !== "0x00") return null
 
         const tokenName =
-          typeof token.token === "string"
-            ? token.token
-            : token.token?.name || "Minima"
+          typeof token.token === "string" ? token.token : "Minima"
 
         return (
           <div key={token.tokenid} className="p-4 space-y-4">
@@ -539,7 +497,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -553,7 +511,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -567,7 +525,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -581,7 +539,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -597,7 +555,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                       className={cn(
                         "font-medium text-primary py-[2px] px-2 mr-1",
                         token.unconfirmed !== "0"
-                          ? "animate-pulse bg-yellow-100 text-yellow-600"
+                          ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                           : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                       )}
                     >
@@ -613,7 +571,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -627,7 +585,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >
@@ -641,7 +599,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                     className={cn(
                       "font-medium text-primary py-[2px] px-2 mr-1",
                       token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600"
+                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
                         : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
                     )}
                   >

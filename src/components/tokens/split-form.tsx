@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -53,7 +54,11 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               name="totalAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Total Amount to Split</FormLabel>
+                  <FormLabel>Amount</FormLabel>
+                  <FormDescription>
+                    The amount of Minima or custom tokens to send to the
+                    specified address.
+                  </FormDescription>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
@@ -67,7 +72,11 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               name="numberOfCoins"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Number of Coins</FormLabel>
+                  <FormLabel>Split</FormLabel>
+                  <FormDescription>
+                    The amount being sent will be split into multiple coins of
+                    equal value.
+                  </FormDescription>
                   <FormControl>
                     <Input type="number" min={2} {...field} />
                   </FormControl>
@@ -84,6 +93,9 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Number of Coins</FormLabel>
+                  <FormDescription>
+                    The number of coins you would like to receive.
+                  </FormDescription>
                   <FormControl>
                     <Input type="number" min={2} {...field} />
                   </FormControl>
@@ -98,6 +110,9 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Amount per Coin</FormLabel>
+                  <FormDescription>
+                    The amount of Minima or custom tokens per coin.
+                  </FormDescription>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>

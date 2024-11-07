@@ -1,38 +1,24 @@
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { CheckCircle, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SplitForm } from "@/components/tokens/split-form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useParams } from "@tanstack/react-router"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { splitCoins } from "@/lib/minima/mds-functions"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { isTxnPending, splitCoins } from "@/lib/minima/mds-functions"
 import { splitFormSchema, SplitFormValues } from "@/lib/schemas"
+import { toast } from "sonner"
+import { MDSError } from "@/lib/error"
 
 export function SplitDialog() {
   const queryClient = useQueryClient()
+  const [splitData, setSplitData] = useState<string | undefined>(undefined)
   const [splitType, setSplitType] = useState<"total" | "perCoin" | "custom">(
     "total"
   )
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
-
-  const { mutate, isPending, isSuccess, reset } = useMutation({
-    mutationFn: (values: SplitFormValues) => splitCoins(values),
-    onSuccess: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: ["coinsByTokenId", tokenId],
-      })
-      await queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
-      await queryClient.invalidateQueries({
-        queryKey: ["balanceByTokenId", tokenId],
-      })
-    },
-    onError: (error) => {
-      console.error("Split failed:", error)
-    },
-  })
 
   const form = useForm<SplitFormValues>({
     resolver: zodResolver(splitFormSchema),
@@ -43,6 +29,39 @@ export function SplitDialog() {
 
       tokenId,
       splitType: "total" as const,
+    },
+  })
+
+  const { mutate, isPending, isSuccess, reset } = useMutation({
+    mutationFn: (values: SplitFormValues) => splitCoins(values),
+    onSuccess: async (data) => {
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      setSplitData(data.data)
+      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
+    },
+    onError: (error) => {
+      if (error instanceof MDSError && error.error_tag === "txpow_to_big") {
+        toast.error(
+          "The transaction is too big to be consolidated. Please try again with fewer coins."
+        )
+      }
+    },
+  })
+
+  const { data: isTxnPendingData } = useQuery({
+    queryKey: ["isPending", tokenId],
+    queryFn: () => isTxnPending(splitData as string),
+    enabled: !!splitData,
+    refetchInterval: (data) => {
+      if (data) {
+        return 1000
+      }
+      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
+      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
+      return false
     },
   })
 
@@ -140,7 +159,7 @@ export function SplitDialog() {
           </motion.div>
         )}
 
-        {isSuccess && (
+        {isSuccess && splitData && (
           <motion.div
             key="success"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -159,9 +178,28 @@ export function SplitDialog() {
               }}
               className="flex flex-col items-center justify-canter gap-2 mt-2 w-full"
             >
-              <div className="text-xl font-medium text-green-400 text-center w-full">
-                Coins split successfully!
-              </div>
+              {!isTxnPendingData ? (
+                <div className="flex flex-col gap-2 items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-emerald-400" />
+                  <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                    Split Successful!
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {typeof splitData === "string" ? (
+                    <div className="flex flex-col gap-2 items-center justify-center">
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        You must accept the split in the pending app...
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                        {splitData}
+                      </p>
+                    </div>
+                  ) : null}
+                </>
+              )}
               <Button
                 type="button"
                 variant="outline"

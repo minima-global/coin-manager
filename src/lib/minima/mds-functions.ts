@@ -5,9 +5,10 @@ import {
   Tokens,
   SendResponse,
 } from "@minima-global/mds"
-import { Failure, Success } from "../error"
+import { MDSError, Success } from "../error"
 import { ConsolidationFormValues } from "@/components/dialogs/consolidation-dialog"
 import { SplitFormValues } from "@/lib/schemas"
+
 async function getBalance(): Promise<Balance.Balance> {
   const balance = await MDS.cmd.balance()
   return balance
@@ -35,7 +36,7 @@ async function getTokenById(
 
 async function checkConsolidation(
   values: ConsolidationFormValues
-): Promise<any> {
+): Promise<Success<string | SendResponse>> {
   const dryRunResult = await MDS.cmd.consolidate({
     params: {
       tokenid: values.tokenId,
@@ -50,28 +51,24 @@ async function checkConsolidation(
 
   // Check if there is an error
   if (error) {
-    return Failure("Error checking consolidation", "consolidation_error")
+    throw new MDSError("Error checking consolidation", "consolidation_error")
   }
 
   // Check if the txpow is too big TODO: check max size
   if (response.size > 64000) {
-    return Failure("Txpow is too big", "txpow_to_big")
+    throw new MDSError("Txpow is too big", "txpow_to_big")
   }
 
   const consolidationResult = await consolidateCoins(values)
 
-  if (consolidationResult.error) {
-    return Failure("Error consolidating coins", "consolidation_error")
-  }
-
-  console.log("consolidationResult", consolidationResult)
-
-  return Success(consolidationResult)
+  return consolidationResult
 }
 
 async function consolidateCoins(
   values: ConsolidationFormValues
-): Promise<SendResponse> {
+): Promise<Success<string | SendResponse>> {
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+
   const result = await MDS.cmd.consolidate({
     params: {
       tokenid: values.tokenId,
@@ -82,7 +79,24 @@ async function consolidateCoins(
     },
   })
 
-  return result
+  // @ts-ignore TODO: fix this
+  const pendingId = result.pendinguid as string
+
+  if (result.error && !pendingId) {
+    if (result.error.includes("TXPOW")) {
+      throw new MDSError(
+        "Transaction is too large to be processed",
+        "txpow_to_big"
+      )
+    }
+    throw new MDSError("Failed to consolidate coins", "consolidation_error")
+  }
+
+  if (pendingId) {
+    return Success(pendingId)
+  }
+
+  return Success(result)
 }
 
 async function balanceByTokenId(
@@ -94,183 +108,153 @@ async function balanceByTokenId(
   return balance
 }
 
-async function getConsolidationPreview(coinIds: string[]): Promise<any> {
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+async function manualConsolidation(coinIds: string[]): Promise<any> {
+  await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    const TXN_ID = "manual-consolidation"
-    let totalAmount: number = 0
+  const TXN_ID =
+    "manual-consolidation-" + Math.random().toString(36).substring(2, 15)
+  let totalAmount: number = 0
 
-    // make sure there are coins to add
-    if (coinIds.length === 0) {
-      throw new Error("No coins to consolidate")
-    }
+  if (coinIds.length === 0) {
+    throw new Error("No coins to consolidate")
+  }
 
-    // Create the txn
-    await MDS.cmd.txncreate({
-      params: {
-        id: TXN_ID,
-      },
-    })
+  await MDS.cmd.txncreate({
+    params: {
+      id: TXN_ID,
+    },
+  })
 
-    // get the total amount of the coins and add them to the txn
-    for (const coinId of coinIds) {
-      const coinAmount = await MDS.cmd.coins({ params: { coinid: coinId } })
+  for (const coinId of coinIds) {
+    const coinAmount = await MDS.cmd.coins({ params: { coinid: coinId } })
 
-      if (coinAmount.error) {
-        throw new Error("Error getting coin")
-      }
-
-      totalAmount += parseFloat(coinAmount.response[0].tokenamount)
-
-      const input = await MDS.cmd.txninput({
-        params: {
-          id: TXN_ID,
-          coinid: coinId,
-        },
-      })
-
-      if (input.error) {
-        throw new Error("Error adding coin to txn")
-      }
-    }
-
-    // get an address from the coin
-    const coin = await MDS.cmd.coins({ params: { coinid: coinIds[0] } })
-
-    if (coin.error) {
+    if (coinAmount.error) {
       throw new Error("Error getting coin")
     }
 
-    const address = coin.response[0].address
+    totalAmount += parseFloat(coinAmount.response[0].tokenamount)
 
-    // check the address
-    let MxAddress: string
-
-    const miniAddress = await MDS.cmd.checkaddress({ params: { address } })
-
-    if (miniAddress.error) {
-      throw new Error("Error checking address")
-    }
-
-    MxAddress = miniAddress.response.Mx
-
-    // create the output
-    const output = await MDS.cmd.txnoutput({
+    const input = await MDS.cmd.txninput({
       params: {
-        address: MxAddress,
-        amount: totalAmount.toString(),
         id: TXN_ID,
-        tokenid: coin.response[0].tokenid,
+        coinid: coinId,
       },
     })
 
-    if (output.error) {
-      throw new Error("Error adding output")
+    if (input.error) {
+      throw new Error("Error adding coin to txn")
     }
-
-    console.log("here 1")
-
-    // sign the txn
-    const post = await MDS.cmd.txnsign({
-      params: {
-        id: TXN_ID,
-        publickey: "auto",
-      },
-    })
-
-    if (post.error && !post.pending) {
-      throw new Error("Error")
-    }
-
-    console.log("COMMAND IS PENDING")
-    console.log(post.command)
-
-    // @ts-ignore TODO: fix this
-    const pendingId = post.pendinguid
-
-    const insert = await MDS.sql(
-      `INSERT INTO CONSOLIDATION (pending_id, txn_id) VALUES ('${pendingId}', '${TXN_ID}')`
-    )
-
-    console.log(insert)
-
-    // post the txn
-    /* const postResult = await MDS.cmd.txnpost({
-      params: {
-        id: TXN_ID,
-        auto: "true",
-        txndelete: "true",
-      },
-    })
-
-    // return the result
-    return postResult*/
-  } catch (error) {
-    throw error
   }
+
+  const coin = await MDS.cmd.coins({ params: { coinid: coinIds[0] } })
+
+  if (coin.error) {
+    throw new Error("Error getting coin")
+  }
+
+  const address = coin.response[0].address
+
+  let MxAddress: string
+
+  const miniAddress = await MDS.cmd.checkaddress({ params: { address } })
+
+  if (miniAddress.error) {
+    throw new Error("Error checking address")
+  }
+
+  MxAddress = miniAddress.response.Mx
+
+  const output = await MDS.cmd.txnoutput({
+    params: {
+      address: MxAddress,
+      amount: totalAmount.toString(),
+      id: TXN_ID,
+      tokenid: coin.response[0].tokenid,
+    },
+  })
+
+  if (output.error) {
+    throw new Error("Error adding output")
+  }
+
+  const post = await MDS.cmd.txnsign({
+    params: {
+      id: TXN_ID,
+      publickey: "auto",
+      txnpostauto: "true",
+    },
+  })
+
+  // @ts-ignore TODO: fix this
+  const pendingId = post.pendinguid as string
+
+  if (pendingId) {
+    return Success(pendingId)
+  }
+
+  return Success(post)
 }
 
 async function splitCoins(values: SplitFormValues): Promise<any> {
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    const address = await MDS.cmd.getaddress()
+  const address = await MDS.cmd.getaddress()
 
-    if (address.error) {
-      throw new Error("Error getting address")
-    }
-
-    const MxAddress = address.response.miniaddress
-    let result: any
-
-    if (values.splitType === "perCoin") {
-      const totalAmount = values.numberOfCoins * values.amountPerCoin
-      result = await MDS.cmd.send({
-        params: {
-          tokenid: values.tokenId,
-          amount: totalAmount.toString(),
-          split: values.numberOfCoins.toString(),
-          address: MxAddress,
-        },
-      })
-      return result
-    } else if (values.splitType === "total") {
-      result = await MDS.cmd.send({
-        params: {
-          tokenid: values.tokenId,
-          amount: values.totalAmount.toString(),
-          split: values.numberOfCoins.toString(),
-          address: MxAddress,
-        },
-      })
-      return result
-    } else if (values.splitType === "custom") {
-      // Create multi array in format ["address:amount", "address2:amount2"]
-      const multi = values.splits.map((split) => {
-        return `${split.address}:${split.amount}`
-      })
-
-      console.log(multi)
-
-      result = await MDS.cmd.send({
-        params: {
-          split: values.splitAmount.toString(),
-          multi: JSON.stringify(multi),
-        },
-      })
-      console.log(result)
-      return result
-    }
-
-    if (result.error) {
-      throw new Error(result.error)
-    }
-
-    return result
-  } catch (error) {
-    throw error
+  if (address.error) {
+    throw new MDSError("Error getting address")
   }
+
+  const MxAddress = address.response.miniaddress
+  let result: any
+
+  if (values.splitType === "perCoin") {
+    const totalAmount = values.numberOfCoins * values.amountPerCoin
+    result = await MDS.cmd.send({
+      params: {
+        tokenid: values.tokenId,
+        amount: totalAmount.toString(),
+        split: values.numberOfCoins.toString(),
+        address: MxAddress,
+      },
+    })
+  } else if (values.splitType === "total") {
+    result = await MDS.cmd.send({
+      params: {
+        tokenid: values.tokenId,
+        amount: values.totalAmount.toString(),
+        split: values.numberOfCoins.toString(),
+        address: MxAddress,
+      },
+    })
+  } else if (values.splitType === "custom") {
+    const multi = values.splits.map((split) => {
+      return `${split.address}:${split.amount}`
+    })
+    result = await MDS.cmd.send({
+      params: {
+        split: values.splitAmount.toString(),
+        multi: JSON.stringify(multi),
+      },
+    })
+  }
+
+  const pendingId = result.pendinguid as string
+
+  if (result.error && !pendingId) {
+    if (result.error.includes("TXPOW")) {
+      throw new MDSError(
+        "Transaction is too large to be processed",
+        "txpow_to_big"
+      )
+    }
+    throw new MDSError("Failed to consolidate coins", "consolidation_error")
+  }
+
+  if (pendingId) {
+    return Success(pendingId)
+  }
+
+  return Success(result)
 }
 
 async function getAddress(): Promise<any> {
@@ -278,8 +262,20 @@ async function getAddress(): Promise<any> {
   return address
 }
 
+async function isTxnPending(uid: string): Promise<any> {
+  const isPending = await MDS.cmd.checkpending({
+    params: { uid },
+  })
+
+  if (isPending.response.pending === false) {
+    return false
+  }
+
+  return true
+}
+
 export {
-  getConsolidationPreview,
+  manualConsolidation,
   getBalance,
   getCoins,
   getCoinsByTokenId,
@@ -289,4 +285,5 @@ export {
   balanceByTokenId,
   splitCoins,
   getAddress,
+  isTxnPending,
 }

@@ -1,5 +1,5 @@
 {
-  "name": "coins",
+  "name": "my-coins",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -19,7 +19,7 @@
     "@chakra-ui/react": "^3.0.2",
     "@emotion/react": "^11.13.3",
     "@hookform/resolvers": "^3.9.1",
-    "@minima-global/mds": "^0.13.5",
+    "@minima-global/mds": "0.13.6",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-icons": "^1.3.0",

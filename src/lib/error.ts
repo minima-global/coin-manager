@@ -36,3 +36,5 @@ export class CustomError<T> extends Error {
     this.error_tag = error_tag ?? DEFAULT_ERROR_TAG
   }
 }
+
+export class MDSError extends CustomError<MDSErrorTags> {}

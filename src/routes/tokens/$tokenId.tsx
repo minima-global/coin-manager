@@ -12,7 +12,7 @@ import { CoinsResponse } from "@minima-global/mds"
 import { createFileRoute } from "@tanstack/react-router"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
-import { SplitDialog } from "@/components/tokens/split"
+import { Split } from "@/components/tokens/split"
 import { InfoIcon } from "lucide-react"
 import {
   ActionBarCloseTrigger,
@@ -195,7 +195,7 @@ const SplitCoins = () => {
           Generating an address uses one of your 64 addresses
         </p>
       </div>
-      <SplitDialog />
+      <Split />
     </div>
   )
 }

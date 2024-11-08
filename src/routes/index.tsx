@@ -39,7 +39,11 @@ export default function TokenManager() {
                 Total Balance
               </p>
               <p className="text-primary-foreground dark:text-primary text-3xl font-bold transition-all duration-500 ease-in-out">
-                {balance?.response[0].total}
+                {balance?.response[0].confirmed.includes(".")
+                  ? balance?.response[0].confirmed.split(".")[0] +
+                    "." +
+                    balance?.response[0].confirmed.split(".")[1].slice(0, 2)
+                  : balance?.response[0].confirmed}
               </p>
             </div>
           </div>

@@ -3,7 +3,10 @@ import { z } from "zod"
 // Base schema with common fields
 const baseSchema = {
   tokenId: z.string(),
-  numberOfCoins: z.coerce.number().min(2, "Must split into at least 2 coins"),
+  numberOfCoins: z.coerce
+    .number()
+    .min(1, "Must split into at least 2 coins")
+    .max(10, "Max 10 coins"),
 }
 
 // Schema for total amount splitting
@@ -49,4 +52,29 @@ export const splitFormSchema = z.discriminatedUnion("splitType", [
   customSplitSchema.extend({ splitType: z.literal("custom") }),
 ])
 
+export const consolidationFormSchema = z.object({
+  minConfirmations: z.coerce
+    .number()
+    .min(0, "Minimum confirmations must be at least 0"),
+  maxSignatures: z.coerce
+    .number()
+    .min(1, "Must have at least 1 signature")
+    .max(5, "Cannot exceed 5 signatures"),
+  maxInputs: z.coerce
+    .number()
+    .min(3, "Must have at least 3 coins")
+    .max(20, "Cannot exceed 20 inputs"),
+  burn: z.coerce.number().min(0, "Burn amount must be at least 0"),
+  tokenId: z.string(),
+})
+
+export const manualConsolidationFormSchema = z.object({
+  coinIds: z.array(z.string()),
+  tokenId: z.string(),
+})
+
+export type ManualConsolidationFormValues = z.infer<
+  typeof manualConsolidationFormSchema
+>
+export type ConsolidationFormValues = z.infer<typeof consolidationFormSchema>
 export type SplitFormValues = z.infer<typeof splitFormSchema>

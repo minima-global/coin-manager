@@ -1,23 +1,25 @@
 import { Button } from "@/components/ui/button"
-import { CheckCircle, Loader2 } from "lucide-react"
-import { useState } from "react"
+import { CheckCircle, Loader2, XCircle } from "lucide-react"
+import { useContext, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SplitForm } from "@/components/tokens/split-form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useParams } from "@tanstack/react-router"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { isTxnPending, splitCoins } from "@/lib/minima/mds-functions"
+import { useMutation } from "@tanstack/react-query"
+import { splitCoins } from "@/lib/minima/mds-functions"
 import { splitFormSchema, SplitFormValues } from "@/lib/schemas"
 import { toast } from "sonner"
 import { MDSError } from "@/lib/error"
+import { appContext } from "@/AppContext"
 
-export function SplitDialog() {
-  const queryClient = useQueryClient()
+export function Split() {
   const [splitData, setSplitData] = useState<string | undefined>(undefined)
   const [splitType, setSplitType] = useState<"total" | "perCoin" | "custom">(
     "total"
   )
+
+  const { mdsEventData } = useContext(appContext)
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
 
   const form = useForm<SplitFormValues>({
@@ -35,33 +37,22 @@ export function SplitDialog() {
   const { mutate, isPending, isSuccess, reset } = useMutation({
     mutationFn: (values: SplitFormValues) => splitCoins(values),
     onSuccess: async (data) => {
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
       setSplitData(data.data)
-      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
     },
     onError: (error) => {
       if (error instanceof MDSError && error.error_tag === "txpow_to_big") {
         toast.error(
           "The transaction is too big to be consolidated. Please try again with fewer coins."
         )
+      } else if (
+        error instanceof MDSError &&
+        error.error_tag === "too_many_outputs"
+      ) {
+        toast.error(
+          "The number of addresses and split amount is too high. Please try again with fewer addresses or a lower split amount."
+        )
       }
-    },
-  })
-
-  const { data: isTxnPendingData } = useQuery({
-    queryKey: ["isPending", tokenId],
-    queryFn: () => isTxnPending(splitData as string),
-    enabled: !!splitData,
-    refetchInterval: (data) => {
-      if (data) {
-        return 1000
-      }
-      queryClient.invalidateQueries({ queryKey: ["coinsByTokenId", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["token", tokenId] })
-      queryClient.invalidateQueries({ queryKey: ["balanceByTokenId", tokenId] })
-      return false
     },
   })
 
@@ -178,28 +169,44 @@ export function SplitDialog() {
               }}
               className="flex flex-col items-center justify-canter gap-2 mt-2 w-full"
             >
-              {!isTxnPendingData ? (
-                <div className="flex flex-col gap-2 items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-emerald-400" />
-                  <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
-                    Split Successful!
-                  </p>
-                </div>
-              ) : (
+              {mdsEventData?.uid === splitData ? (
                 <>
-                  {typeof splitData === "string" ? (
+                  {mdsEventData.accept ? (
                     <div className="flex flex-col gap-2 items-center justify-center">
-                      <Loader2 className="w-8 h-8 animate-spin" />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        You must accept the split in the pending app...
+                      <CheckCircle className="w-8 h-8 text-emerald-400" />
+                      <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                        Split Successful!
                       </p>
                       <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
-                        {splitData}
+                        Your coins will be available to use shortly
                       </p>
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="flex flex-col gap-2 items-center justify-center">
+                      <XCircle className="w-8 h-8 text-red-400" />
+                      <p className="text-sm text-muted-foreground mt-2 text-red-400">
+                        Split Failed!
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {typeof splitData === "string" &&
+                    mdsEventData?.uid !== splitData && (
+                      <div className="flex flex-col gap-2 items-center justify-center">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <p className="text-sm text-muted-foreground mt-2">
+                          You must accept the split in the pending app...
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                          {splitData}
+                        </p>
+                      </div>
+                    )}
                 </>
               )}
+
               <Button
                 type="button"
                 variant="outline"

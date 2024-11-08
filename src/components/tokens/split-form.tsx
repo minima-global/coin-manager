@@ -144,7 +144,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                               onClick={() => handleGenerateAddress(index)}
                               className="w-full"
                             >
-                              Get Address
+                              Use one of my addresses
                             </Button>
                           </div>
                           <FormMessage />

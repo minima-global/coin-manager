@@ -6,7 +6,7 @@ import {
   SendResponse,
 } from "@minima-global/mds"
 import { MDSError, Success } from "../error"
-import { ConsolidationFormValues } from "@/components/dialogs/consolidation-dialog"
+import { ConsolidationFormValues } from "@/lib/schemas"
 import { SplitFormValues } from "@/lib/schemas"
 
 async function getBalance(): Promise<Balance.Balance> {
@@ -109,7 +109,7 @@ async function balanceByTokenId(
 }
 
 async function manualConsolidation(coinIds: string[]): Promise<any> {
-  await new Promise((resolve) => setTimeout(resolve, 3000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   const TXN_ID =
     "manual-consolidation-" + Math.random().toString(36).substring(2, 15)
@@ -132,7 +132,9 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
       throw new Error("Error getting coin")
     }
 
-    totalAmount += parseFloat(coinAmount.response[0].tokenamount)
+    totalAmount += parseFloat(
+      coinAmount.response[0].tokenamount || coinAmount.response[0].amount
+    )
 
     const input = await MDS.cmd.txninput({
       params: {
@@ -196,7 +198,7 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
 }
 
 async function splitCoins(values: SplitFormValues): Promise<any> {
-  await new Promise((resolve) => setTimeout(resolve, 3000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   const address = await MDS.cmd.getaddress()
 
@@ -230,6 +232,9 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
     const multi = values.splits.map((split) => {
       return `${split.address}:${split.amount}`
     })
+    if (multi.length * values.splitAmount > 15) {
+      throw new MDSError("Too many outputs", "too_many_outputs")
+    }
     result = await MDS.cmd.send({
       params: {
         split: values.splitAmount.toString(),
@@ -262,18 +267,6 @@ async function getAddress(): Promise<any> {
   return address
 }
 
-async function isTxnPending(uid: string): Promise<any> {
-  const isPending = await MDS.cmd.checkpending({
-    params: { uid },
-  })
-
-  if (isPending.response.pending === false) {
-    return false
-  }
-
-  return true
-}
-
 export {
   manualConsolidation,
   getBalance,
@@ -285,5 +278,4 @@ export {
   balanceByTokenId,
   splitCoins,
   getAddress,
-  isTxnPending,
 }

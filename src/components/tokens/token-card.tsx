@@ -108,24 +108,7 @@ export function TokenCard({
           <p className="text-sm text-muted-foreground">
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
-              )}
-            >
-              Amount:
-            </span>
-            {Number(balance?.response[0].total).toFixed(2)}
-          </p>
-
-          <p className="text-sm text-muted-foreground">
-            <span
-              className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
               )}
             >
               Description:
@@ -136,10 +119,7 @@ export function TokenCard({
           <p className="text-sm truncate text-muted-foreground">
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
               )}
             >
               Token ID:
@@ -147,29 +127,13 @@ export function TokenCard({
             {token.response.tokenid}
           </p>
           <div className="w-full h-[1px] bg-border" />
-          <p className="text-sm text-muted-foreground">
-            <span
-              className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
-              )}
-            >
-              Total:
-            </span>
-            {token.response.total}
-          </p>
-          <div className="w-full h-[1px] bg-border" />
+
           {totalCoins && (
             <>
               <p className="text-sm text-muted-foreground">
                 <span
                   className={cn(
-                    "font-medium text-primary py-[2px] px-2 mr-1",
-                    balance?.response[0].unconfirmed !== "0"
-                      ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                      : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                    "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
                   )}
                 >
                   Total Coins:
@@ -182,10 +146,7 @@ export function TokenCard({
           <p className="text-sm text-muted-foreground">
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
               )}
             >
               Web Validated:
@@ -194,13 +155,18 @@ export function TokenCard({
           </p>
           <div className="w-full h-[1px] bg-border" />
 
-          <p className="text-sm text-muted-foreground">
+          <p
+            className={cn(
+              "text-sm",
+              balance?.response[0].unconfirmed !== "0"
+                ? "text-yellow-600 animate-pulse font-bold"
+                : "text-muted-foreground"
+            )}
+          >
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                balance?.response[0].unconfirmed !== "0" ? "animate-pulse" : ""
               )}
             >
               Sendable:
@@ -208,13 +174,18 @@ export function TokenCard({
             {Number(balance?.response[0].sendable).toFixed(2)}
           </p>
           <div className="w-full h-[1px] bg-border" />
-          <p className="text-sm text-muted-foreground">
+          <p
+            className={cn(
+              "text-sm",
+              balance?.response[0].unconfirmed !== "0"
+                ? "text-yellow-600 animate-pulse font-bold"
+                : "text-muted-foreground"
+            )}
+          >
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                balance?.response[0].unconfirmed !== "0" ? "animate-pulse" : ""
               )}
             >
               Confirmed:
@@ -222,13 +193,18 @@ export function TokenCard({
             {Number(balance?.response[0].confirmed).toFixed(2)}
           </p>
           <div className="w-full h-[1px] bg-border" />
-          <p className="text-sm text-muted-foreground">
+          <p
+            className={cn(
+              "text-sm",
+              balance?.response[0].unconfirmed !== "0"
+                ? "text-yellow-600 animate-pulse font-bold"
+                : "text-muted-foreground"
+            )}
+          >
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1",
-                balance?.response[0].unconfirmed !== "0"
-                  ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                balance?.response[0].unconfirmed !== "0" ? "animate-pulse" : ""
               )}
             >
               Unconfirmed:
@@ -377,7 +353,9 @@ export const CoinCard = ({
                       <span className="font-medium bg-[#f4f4f5] dark:bg-[#18181b] text-primary py-[2px] px-2 mr-1">
                         Address:
                       </span>
-                      <span className="font-mono truncate">{coin.address}</span>
+                      <span className="font-mono truncate">
+                        {coin.miniaddress}
+                      </span>
                     </div>
                   )}
                   {coin.tokenid && (
@@ -495,24 +473,7 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                 <p className="text-sm text-muted-foreground">
                   <span
                     className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
-                    )}
-                  >
-                    Amount:
-                  </span>
-                  {Number(token.total).toFixed(2)}
-                </p>
-
-                <p className="text-sm text-muted-foreground">
-                  <span
-                    className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
                     )}
                   >
                     Description:
@@ -520,13 +481,10 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                   Minima Token
                 </p>
                 <div className="w-full h-[1px] bg-border" />
-                <p className="text-sm truncate text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span
                     className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
                     )}
                   >
                     Token ID:
@@ -534,29 +492,12 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                   {token.tokenid}
                 </p>
                 <div className="w-full h-[1px] bg-border" />
-                <p className="text-sm text-muted-foreground">
-                  <span
-                    className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
-                    )}
-                  >
-                    Total:
-                  </span>
-                  {token.total}
-                </p>
-                <div className="w-full h-[1px] bg-border" />
 
                 <>
                   <p className="text-sm text-muted-foreground">
                     <span
                       className={cn(
-                        "font-medium text-primary py-[2px] px-2 mr-1",
-                        token.unconfirmed !== "0"
-                          ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                          : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                        "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
                       )}
                     >
                       Total Coins:
@@ -566,46 +507,73 @@ export function MinimaTokenCard({ token, type }: MinimaTokenCardProps) {
                   <div className="w-full h-[1px] bg-border" />
                 </>
 
-                <p className="text-sm text-muted-foreground">
+                <p
+                  className={cn(
+                    "text-sm",
+                    token.unconfirmed !== "0"
+                      ? "text-yellow-600 animate-pulse font-bold"
+                      : "text-muted-foreground"
+                  )}
+                >
                   <span
                     className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                      token.unconfirmed !== "0" ? "animate-pulse" : ""
                     )}
                   >
                     Sendable:
                   </span>
-                  {token.sendable}
+                  {token.sendable.includes(".")
+                    ? token.sendable.split(".")[0] +
+                      "." +
+                      token.sendable.split(".")[1].slice(0, 2)
+                    : token.sendable}
                 </p>
                 <div className="w-full h-[1px] bg-border" />
-                <p className="text-sm text-muted-foreground">
+                <p
+                  className={cn(
+                    "text-sm",
+                    token.unconfirmed !== "0"
+                      ? "text-yellow-600 animate-pulse font-bold"
+                      : "text-muted-foreground"
+                  )}
+                >
                   <span
                     className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                      token.unconfirmed !== "0" ? "animate-pulse" : ""
                     )}
                   >
                     Confirmed:
                   </span>
-                  {token.confirmed}
+                  {token.confirmed.includes(".")
+                    ? token.confirmed.split(".")[0] +
+                      "." +
+                      token.confirmed.split(".")[1].slice(0, 2)
+                    : token.confirmed}
                 </p>
                 <div className="w-full h-[1px] bg-border" />
-                <p className="text-sm text-muted-foreground">
+                <p
+                  className={cn(
+                    "text-sm",
+                    token.unconfirmed !== "0"
+                      ? "text-yellow-600 animate-pulse font-bold"
+                      : "text-muted-foreground"
+                  )}
+                >
                   <span
                     className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1",
-                      token.unconfirmed !== "0"
-                        ? "animate-pulse bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-200"
-                        : "dark:bg-[#18181b] bg-[#ebebeb] text-primary"
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                      token.unconfirmed !== "0" ? "animate-pulse" : ""
                     )}
                   >
                     Unconfirmed:
                   </span>
-                  {token.unconfirmed}
+                  {token.unconfirmed.includes(".")
+                    ? token.unconfirmed.split(".")[0] +
+                      "." +
+                      token.unconfirmed.split(".")[1].slice(0, 2)
+                    : token.unconfirmed}
                 </p>
               </div>
             )}

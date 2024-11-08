@@ -3,14 +3,14 @@ import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-
 import { AnimatePresence, motion } from "framer-motion"
-import { ConsolidationFormValues } from "../dialogs/consolidation-dialog"
+import { ConsolidationFormValues } from "@/lib/schemas"
 
 interface ConsolidateFormProps {
   onSubmit: (values: ConsolidationFormValues) => void
@@ -36,6 +36,9 @@ export function ConsolidateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Max Coins</FormLabel>
+              <FormDescription>
+                Enter the maximum number of coins to consolidate
+              </FormDescription>
               <FormControl>
                 <Input type="number" min={1} max={20} {...field} />
               </FormControl>
@@ -60,6 +63,10 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Coin Age</FormLabel>
+                      <FormDescription>
+                        Enter the minimum block confirmations required for the
+                        coins being consolidated
+                      </FormDescription>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
@@ -74,6 +81,11 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Max Signatures</FormLabel>
+                      <FormDescription>
+                        If your coins are split across multiple wallet
+                        addresses, enter the maximum number of addresses to be
+                        used in the consolidation.
+                      </FormDescription>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
@@ -88,6 +100,9 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Burn</FormLabel>
+                      <FormDescription>
+                        Enter a value of Minima to burn with the transaction
+                      </FormDescription>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>

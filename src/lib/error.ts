@@ -2,7 +2,7 @@ export type MDSErrorTags =
   | "consolidation_error"
   | "txpow_to_big"
   | "split_error"
-
+  | "too_many_outputs"
 export const DEFAULT_ERROR_TAG = "server_error"
 
 type DefaultErrorTag = typeof DEFAULT_ERROR_TAG

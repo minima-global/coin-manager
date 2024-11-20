@@ -14,6 +14,8 @@ import { ThemeProvider } from "./components/theme-provider.tsx"
 import { ChakraProvider } from "@chakra-ui/react"
 import { createSystem, defaultConfig } from "@chakra-ui/react"
 import { Toaster } from "@/components/ui/sonner"
+import { NuqsAdapter } from "nuqs/adapters/react"
+import { SplashScreen } from "./components/splash-screen.tsx"
 
 // Debug mode
 if (import.meta.env.MODE === "development") {
@@ -55,15 +57,26 @@ const client = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ChakraProvider value={system}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <QueryClientProvider client={client}>
-          <AppProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </AppProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ChakraProvider>
+    <NuqsAdapter>
+      <ChakraProvider value={system}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <QueryClientProvider client={client}>
+            <AppProvider>
+              <RouterProvider router={router} />
+              <SplashScreen />
+              <Toaster
+                toastOptions={{
+                  classNames: {
+                    toast: "dark:bg-darkContrast bg-grey10",
+                    success: "dark:text-[#4FE3C1] text-black",
+                    error: "dark:text-[#FF627E] text-black",
+                  },
+                }}
+              />
+            </AppProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ChakraProvider>
+    </NuqsAdapter>
   </React.StrictMode>
 )

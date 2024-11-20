@@ -1,100 +1,259 @@
 import { useMinima } from "@/hooks/use-minima"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import CheckmarkIcon from "@/components/ui/icons"
+import { Fragment } from "react/jsx-runtime"
 
 export const Route = createFileRoute("/")({
   component: TokenManager,
 })
 
-import { useState } from "react"
-
-import { ArrowUpDown, Coins } from "lucide-react"
-import { Button } from "@/components/ui/button"
-
 export default function TokenManager() {
   const { balance } = useMinima()
-  const [selectedTokens, setSelectedTokens] = useState<string[]>([])
 
-  const handleGroupTokens = () => {
-    setSelectedTokens([])
-  }
+  const tokenNameStyle =
+    "font-bold truncate text-neutral-600 dark:text-neutral-400"
+  const tokenAmountStyle =
+    "font-bold truncate text-neutral-800 dark:text-neutral-300"
 
   return (
-    <div className="container mx-auto  max-w-2xl">
+    <div className="container mx-auto ">
       <h1 className="text-2xl font-bold mb-4">Tokens</h1>
-      <div className="mb-8 p-6 bg-gradient-to-r from-primary/90 to-primary dark:from-primary/20 dark:to-primary/40 rounded-lg shadow-lg backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <svg
-              width="37"
-              height="33"
-              viewBox="0 0 37 33"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="fill-primary-foreground dark:fill-primary"
-            >
-              <path d="M28.8727 9.20966L27.2806 16.2518L25.2445 7.7553L18.1105 4.86191L16.1816 13.3737L14.4823 3.39225L7.34831 0.51416L0 32.9998H7.79227L10.0427 23.0183L11.742 32.9998H19.5496L21.4632 24.488L23.4993 32.9998H31.2915L36.022 12.0877L28.8727 9.20966Z" />
-            </svg>
-            <div>
-              <p className="text-primary-foreground dark:text-primary text-lg font-semibold">
-                Total Balance
-              </p>
-              <p className="text-primary-foreground dark:text-primary text-3xl font-bold transition-all duration-500 ease-in-out">
-                {balance?.response[0].confirmed.includes(".")
-                  ? balance?.response[0].confirmed.split(".")[0] +
-                    "." +
-                    balance?.response[0].confirmed.split(".")[1].slice(0, 2)
-                  : balance?.response[0].confirmed}
-              </p>
-            </div>
-          </div>
-          <ArrowUpDown className="h-8 w-8 text-primary-foreground dark:text-primary opacity-50" />
-        </div>
-      </div>
+
       <div className="grid gap-4">
         {balance?.response.map((token) => (
-          <Link
-            key={token.tokenid}
-            to="/tokens/$tokenId"
-            params={{ tokenId: token.tokenid }}
-            className="flex items-center justify-between p-4 bg-card rounded-lg shadow transition-all duration-300 ease-in-out hover:bg-card/80 hover:shadow-md hover:scale-[1.02] cursor-pointer dark:shadow-muted"
-          >
-            <div className="flex items-center space-x-4">
-              <Coins className="h-6 w-6 text-primary" />
-              <div>
-                <p className="font-medium">
-                  {typeof token.token === "string"
-                    ? token.token
-                    : token.token.name || "Unknown Token"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {typeof token.token === "string"
-                    ? token.token
-                    : token.token.name || "Unknown Token"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <p className="font-medium">
-                {token.confirmed.includes(".")
-                  ? token.confirmed.split(".")[0] +
-                    "." +
-                    token.confirmed.split(".")[1].slice(0, 2)
-                  : token.confirmed}
-              </p>
-              <Button variant="outline" size="sm" onClick={() => {}}>
-                Manage
-              </Button>
-            </div>
-          </Link>
+          <Fragment key={token.tokenid}>
+            {token.tokenid === "0x00" ? (
+              <Link
+                to="/tokens/$tokenId"
+                params={{ tokenId: token.tokenid }}
+                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[9999]"
+              >
+                <div className="w-[48px] h-[48px] border border-darkConstrast dark:border-grey80 rounded overflow-hidden">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect width="48" height="48" fill="white" />
+                    <path
+                      d="M32.4428 16.759L31.2053 22.2329L29.6226 15.6286L24.0773 13.3795L22.578 19.9957L21.2571 12.2371L15.7119 10L10 35.2512H16.0569L17.8062 27.4926L19.1271 35.2512H25.1959L26.6834 28.6349L28.266 35.2512H34.323L38 18.9962L32.4428 16.759Z"
+                      fill="black"
+                    />
+                  </svg>
+                </div>
+                <div className="overflow-hidden px-4">
+                  <div className="flex">
+                    <h6 className={tokenNameStyle}>Minima</h6>
+                    <div className="!text-blue-500 my-auto ml-1">
+                      <CheckmarkIcon fill="currentColor" size={16} />
+                    </div>
+                  </div>
+
+                  <p className={tokenAmountStyle}>
+                    {token.confirmed.includes(".")
+                      ? token.confirmed.split(".")[0] +
+                        "." +
+                        token.confirmed.split(".")[1].slice(0, 2)
+                      : token.confirmed}
+                  </p>
+                </div>
+                <div className="flex items-center justify-end flex-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <mask
+                      id="mask0_5387_25757"
+                      width="20"
+                      height="20"
+                      x="0"
+                      y="0"
+                      maskUnits="userSpaceOnUse"
+                      style={{ maskType: "alpha" }}
+                    >
+                      <path fill="#D9D9D9" d="M0 20V0h20v20z"></path>
+                    </mask>
+                    <g mask="url(#mask0_5387_25757)">
+                      <path
+                        fill="#91919D"
+                        d="m13.063 10-5 5L7 13.938 10.938 10 7 6.063 8.063 5z"
+                      ></path>
+                    </g>
+                  </svg>
+                </div>
+              </Link>
+            ) : (
+              <Link
+                to="/tokens/$tokenId"
+                params={{ tokenId: token.tokenid }}
+                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[9999]"
+              >
+                <div className="aspect-square w-12 h-12 overflow-hidden">
+                  <img
+                    alt="token-icon"
+                    src={
+                      typeof token.token === "object" &&
+                      "url" in token.token &&
+                      token.token.url.length
+                        ? decodeURIComponent(token.token.url)
+                        : `https://robohash.org/${token.tokenid}`
+                    }
+                    className="border-grey80 dark:border-mediumDarkContrast border rounded w-full h-full"
+                  />
+                </div>
+
+                <div className="overflow-hidden flex flex-col items-start justify-center px-4 ">
+                  <div className="flex">
+                    <h6 className={tokenNameStyle}>
+                      {typeof token.token === "object" &&
+                      "name" in token.token &&
+                      typeof token.token.name === "string"
+                        ? token.token.name
+                        : "N/A"}
+                    </h6>
+                    {/**TODO: Add validation */}
+                    <div className="!text-blue-500 my-auto ml-1">
+                      <CheckmarkIcon fill="currentColor" size={16} />
+                    </div>
+                  </div>
+                  <p className={tokenAmountStyle}>
+                    {token.confirmed.includes(".")
+                      ? token.confirmed.split(".")[0] +
+                        "." +
+                        token.confirmed.split(".")[1].slice(0, 2)
+                      : token.confirmed}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end flex-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <mask
+                      id="mask0_5387_25757"
+                      width="20"
+                      height="20"
+                      x="0"
+                      y="0"
+                      maskUnits="userSpaceOnUse"
+                      style={{ maskType: "alpha" }}
+                    >
+                      <path fill="#D9D9D9" d="M0 20V0h20v20z"></path>
+                    </mask>
+                    <g mask="url(#mask0_5387_25757)">
+                      <path
+                        fill="#91919D"
+                        d="m13.063 10-5 5L7 13.938 10.938 10 7 6.063 8.063 5z"
+                      ></path>
+                    </g>
+                  </svg>
+                </div>
+              </Link>
+            )}
+          </Fragment>
         ))}
       </div>
-      {selectedTokens.length > 0 && (
-        <div className="mt-4 flex justify-end">
-          <Button onClick={handleGroupTokens}>
-            Group Selected Tokens ({selectedTokens.length})
-          </Button>
-        </div>
-      )}
+
+      <div className=" absolute bottom-0 right-0 mr-10 z-0">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1123"
+          height="607"
+          fill="none"
+          viewBox="0 0 1123 607"
+        >
+          <g opacity="0.3">
+            <g filter="url(#filter0_f_5457_6559)">
+              <ellipse
+                cx="617.286"
+                cy="721.516"
+                fill="url(#paint0_linear_5457_6559)"
+                rx="379.286"
+                ry="427.441"
+              ></ellipse>
+            </g>
+            <g filter="url(#filter1_f_5457_6559)">
+              <path
+                fill="url(#paint1_linear_5457_6559)"
+                d="m741.282 179 330.578 645.271H410.705z"
+              ></path>
+            </g>
+          </g>
+          <defs>
+            <linearGradient
+              id="paint0_linear_5457_6559"
+              x1="316.41"
+              x2="929.261"
+              y1="352.985"
+              y2="1078.48"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor="#6100FF"></stop>
+              <stop offset="1" stopColor="#0FF" stopOpacity="0"></stop>
+            </linearGradient>
+            <linearGradient
+              id="paint1_linear_5457_6559"
+              x1="741.282"
+              x2="741.282"
+              y1="179"
+              y2="1039.36"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor="#50F"></stop>
+              <stop offset="1" stopColor="#00A3FF" stopOpacity="0"></stop>
+            </linearGradient>
+            <filter
+              id="filter0_f_5457_6559"
+              width="1233.32"
+              height="1329.63"
+              x="0.627"
+              y="56.702"
+              colorInterpolationFilters="sRGB"
+              filterUnits="userSpaceOnUse"
+            >
+              <feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood>
+              <feBlend
+                in="SourceGraphic"
+                in2="BackgroundImageFix"
+                result="shape"
+              ></feBlend>
+              <feGaussianBlur
+                result="effect1_foregroundBlur_5457_6559"
+                stdDeviation="118.687"
+              ></feGaussianBlur>
+            </filter>
+            <filter
+              id="filter1_f_5457_6559"
+              width="1017.21"
+              height="1001.33"
+              x="232.675"
+              y="0.97"
+              colorInterpolationFilters="sRGB"
+              filterUnits="userSpaceOnUse"
+            >
+              <feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood>
+              <feBlend
+                in="SourceGraphic"
+                in2="BackgroundImageFix"
+                result="shape"
+              ></feBlend>
+              <feGaussianBlur
+                result="effect1_foregroundBlur_5457_6559"
+                stdDeviation="89.015"
+              ></feGaussianBlur>
+            </filter>
+          </defs>
+        </svg>
+      </div>
     </div>
   )
 }

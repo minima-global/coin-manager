@@ -239,6 +239,7 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
       params: {
         split: values.splitAmount.toString(),
         multi: JSON.stringify(multi),
+        tokenid: values.tokenId,
       },
     })
   }

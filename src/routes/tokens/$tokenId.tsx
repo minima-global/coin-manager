@@ -82,8 +82,9 @@ function Tokens() {
                       Consolidate your coins
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Libero illo dolores sunt esse ipsa, voluptas quod?
+                      Combines multiple small coins into larger ones. This is
+                      essential for preventing “dust” - lots of tiny coins that
+                      clutter your wallet.
                     </p>
                   </div>
                   <Button
@@ -101,8 +102,8 @@ function Tokens() {
                       Split your coins
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Libero illo dolores sunt esse ipsa, voluptas quod?
+                      Break down larger coins into smaller amounts. This ensures
+                      you have multiple coins available for transactions
                     </p>
                   </div>
                   <Button

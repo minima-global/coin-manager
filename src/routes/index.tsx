@@ -1,10 +1,15 @@
 import { useMinima } from "@/hooks/use-minima"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import CheckmarkIcon from "@/components/ui/icons"
 import { Fragment } from "react/jsx-runtime"
 
 export const Route = createFileRoute("/")({
   component: TokenManager,
+  beforeLoad: () => {
+    if (!localStorage.getItem("hasSeenSplash")) {
+      return redirect({ to: "/info" })
+    }
+  },
 })
 
 export default function TokenManager() {

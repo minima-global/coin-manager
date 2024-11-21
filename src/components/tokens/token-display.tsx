@@ -75,6 +75,12 @@ export function TokenDisplay({
       </AnimatePresence>
 
       <BalanceDisplay
+        label="Sendable"
+        value={token.sendable}
+        isUnconfirmed={isUnconfirmedBalance}
+      />
+      <div className="w-full h-[1px] bg-border" />
+      <BalanceDisplay
         label="Confirmed"
         value={token.confirmed}
         isUnconfirmed={isUnconfirmedBalance}

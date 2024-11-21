@@ -212,7 +212,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                               variant="outline"
                               size="sm"
                               onClick={() => handleGenerateAddress(index)}
-                              className="w-full"
+                              className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40"
                             >
                               Use one of my addresses
                             </Button>
@@ -260,7 +260,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="mt-8"
+                    className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 mt-8"
                     onClick={() => remove(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -272,7 +272,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               type="button"
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40"
               onClick={() => append({ address: "", amount: 0 })}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -284,7 +284,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               name="splitAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Split Amount (for all)</FormLabel>
+                  <FormLabel>Split Amount</FormLabel>
                   <FormControl>
                     <div className=" relative flex items-center">
                       <Input

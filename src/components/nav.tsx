@@ -99,7 +99,7 @@ export const Nav = ({
   return (
     <div
       ref={scrollRef}
-      className="border-b border-muted mt-4 pb-2 w-full overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing"
+      className="border-b border-muted mt-4 pb-2 w-full overflow-x-auto overflow-y-hidden scrollbar-hide md:cursor-default cursor-grab active:cursor-grabbing"
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}

@@ -61,7 +61,7 @@ const Header = () => {
                     <Link to="/">
                       <HomeIcon />
                     </Link>
-                    <Link to="/">
+                    <Link to="/info">
                       <InfoIcon />
                     </Link>
                     <ModeToggle />

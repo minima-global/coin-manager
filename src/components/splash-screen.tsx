@@ -26,7 +26,7 @@ export function SplashScreen() {
         className="invert dark:invert-0"
       />
       <h1 className="text-primary text-2xl font-bold">Minima Coin Manager</h1>
-      <span className="text-muted-foreground text-sm">Version 0.0.1</span>
+      <span className="text-muted-foreground text-sm">Version 0.3.0</span>
     </div>
   )
 }

@@ -207,20 +207,32 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                                 </div>
                               </div>
                             </FormControl>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleGenerateAddress(index)}
-                              className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40"
-                            >
-                              Use one of my addresses
-                            </Button>
                           </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleGenerateAddress(index)}
+                            className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 "
+                          >
+                            Use one of my addresses
+                          </Button>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 mt-8 px-4"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
 
                   <FormField
@@ -255,17 +267,6 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                     )}
                   />
                 </div>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 mt-8"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             ))}
             <Button

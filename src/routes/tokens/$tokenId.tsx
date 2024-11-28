@@ -2,7 +2,6 @@ import { useQueryState } from "nuqs"
 import { ManualConsolidationDialog } from "@/components/dialogs/consolidation-dialog"
 import { CoinCard, TokenCard } from "@/components/tokens/token-card"
 import { useMinima } from "@/hooks/use-minima"
-import { CoinsResponse } from "@minima-global/mds"
 import { createFileRoute } from "@tanstack/react-router"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeftIcon } from "lucide-react"
@@ -16,6 +15,8 @@ import { Button } from "@/components/ui/button"
 import { ConsolidationContent } from "@/components/tokens/consolidation-content"
 import { useState } from "react"
 import { Split } from "@/components/tokens/split"
+import { MDSResObj } from "@minima-global/mds"
+import { Coin } from "@minima-global/mds"
 
 // Define type for tab values
 type TabValue = "consolidate" | "split" | null
@@ -62,7 +63,7 @@ function Tokens() {
             isLinkEnabled={false}
             type="showcase"
             totalCoins={coins?.response.length}
-            balance={balance}
+            balance={balance.response}
             tab={activeTab}
           />
 
@@ -155,7 +156,7 @@ function Tokens() {
 }
 
 interface ConsolidateProps {
-  coins: CoinsResponse
+  coins: MDSResObj<Coin[]>
   disabled: boolean
 }
 

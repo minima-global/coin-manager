@@ -21,15 +21,15 @@ import {
 import { ManualConsolidationContent } from "@/components/tokens/consolidation-content"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { motion } from "framer-motion"
-import { SendResponse } from "@minima-global/mds"
 import { useContext } from "react"
 import { appContext } from "@/AppContext"
+import type { MDSResObj, Transaction } from "@minima-global/mds"
 
 interface ConsolidationDialogProps {
   disabled?: boolean
   error: Error | null
   isPending: boolean
-  consolidationData: SendResponse | string | undefined
+  consolidationData: MDSResObj<Transaction> | string | undefined
   isSuccess: boolean
 }
 

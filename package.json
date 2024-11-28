@@ -19,7 +19,7 @@
     "@chakra-ui/react": "^3.0.2",
     "@emotion/react": "^11.13.3",
     "@hookform/resolvers": "^3.9.1",
-    "@minima-global/mds": "0.13.6",
+    "@minima-global/mds": "0.14.1",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-icons": "^1.3.0",

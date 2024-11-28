@@ -1,10 +1,10 @@
-import { Balance } from "@minima-global/mds"
 import { cn } from "@/lib/utils"
+import { Balance } from "@minima-global/mds"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface TokenDisplayProps {
-  token: Balance.RawBalance
-  balance?: Balance.Balance
+  token: Balance
+  balance?: Balance[]
   totalCoins?: number
   tab?: string
 }
@@ -15,7 +15,7 @@ export function TokenDisplay({
   totalCoins,
   tab,
 }: TokenDisplayProps) {
-  const isUnconfirmedBalance = balance?.response[0].unconfirmed !== "0"
+  const isUnconfirmedBalance = balance?.[0].unconfirmed !== "0"
 
   return (
     <div className="space-y-3">

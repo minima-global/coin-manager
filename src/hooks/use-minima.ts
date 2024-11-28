@@ -6,28 +6,34 @@ import {
   getCoinsByTokenId,
   getTokenById,
 } from "@/lib/minima/mds-functions"
-import { Balance, CoinsResponse, Tokens } from "@minima-global/mds"
+import type {
+  Balance,
+  BalanceWithTokenDetails,
+  Coin,
+  MDSResObj,
+  Token,
+} from "@minima-global/mds"
 import { useQuery } from "@tanstack/react-query"
 import { useContext } from "react"
 
 export function useMinima() {
   const { isInited } = useContext(appContext)
 
-  const balance = useQuery<Balance.Balance | null>({
+  const balance = useQuery<MDSResObj<Balance[]> | null>({
     queryKey: ["balance"],
     queryFn: getBalance,
     enabled: isInited,
     refetchInterval: 5000, // 5 seconds
   })
 
-  const coins = useQuery<CoinsResponse | null>({
+  const coins = useQuery<MDSResObj<Coin[]> | null>({
     queryKey: ["coins"],
     queryFn: getCoins,
     enabled: isInited,
   })
 
   const coinsByTokenId = (tokenId: string) => {
-    return useQuery<CoinsResponse | null>({
+    return useQuery<MDSResObj<Coin[]> | null>({
       queryKey: ["coinsByTokenId", tokenId],
       queryFn: () => getCoinsByTokenId(tokenId),
       enabled: isInited,
@@ -35,7 +41,7 @@ export function useMinima() {
   }
 
   const tokenById = (tokenId: string) => {
-    return useQuery<Tokens.TokenResponseSingle | null>({
+    return useQuery<MDSResObj<Token> | null>({
       queryKey: ["token", tokenId],
       queryFn: () => getTokenById(tokenId),
       enabled: isInited,
@@ -44,7 +50,7 @@ export function useMinima() {
   }
 
   const balanceByTokenIdQuery = (tokenId: string) => {
-    return useQuery<Balance.BalanceWithTokenDetails | undefined>({
+    return useQuery<MDSResObj<BalanceWithTokenDetails[]> | undefined>({
       queryKey: ["balanceByTokenId", tokenId],
       queryFn: () => balanceByTokenId(tokenId),
       enabled: isInited,

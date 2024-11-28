@@ -1,4 +1,4 @@
-import { MDS } from "@minima-global/mds"
+import { MDS, MinimaEvents } from "@minima-global/mds"
 import { useQueryClient } from "@tanstack/react-query"
 import { createContext, useRef, useEffect, useState } from "react"
 
@@ -30,19 +30,16 @@ const AppProvider = ({ children }: IProps) => {
       loaded.current = true
 
       MDS.init(async ({ event, data }) => {
-        if (event === "inited") {
+        if (event === MinimaEvents.INITED) {
           setIsInited(true)
           MDS.log("MDS INITED AND READY 🚀")
           const topBlock = await MDS.cmd.block()
           setTopBlock(topBlock.response.block)
-
-          // @ts-ignore TODO: Fix this
-        } else if (event === "MDS_PENDING") {
+        } else if (event === MinimaEvents.PENDING) {
           setMdsEventData(data)
           console.log("MDS PENDING", data)
           queryClient.invalidateQueries()
-        } else if (event === "NEWBLOCK") {
-          // @ts-ignore TODO: Fix this
+        } else if (event === MinimaEvents.NEWBLOCK) {
           setTopBlock(data.txpow.header.block)
         }
       })

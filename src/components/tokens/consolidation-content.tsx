@@ -8,7 +8,6 @@ import {
   consolidateCoins,
   manualConsolidation,
 } from "@/lib/minima/mds-functions"
-import { SendResponse } from "@minima-global/mds"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useParams } from "@tanstack/react-router"
@@ -23,12 +22,13 @@ import { consolidationFormSchema } from "@/lib/schemas"
 import { appContext } from "@/AppContext"
 import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog"
 import { CopyButton } from "../copy-button"
+import type { MDSResObj, Transaction } from "@minima-global/mds"
 
 export function ConsolidationContent() {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false)
   const [cliCommand, setCliCommand] = useState("")
   const [consolidationData, setConsolidationData] = useState<
-    SendResponse | string | undefined
+    MDSResObj<Transaction> | string | undefined
   >()
 
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
@@ -151,7 +151,7 @@ export function ManualConsolidationContent({
   const { mdsEventData } = useContext(appContext)
   const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
   const [consolidationData, setConsolidationData] = useState<
-    string | undefined | SendResponse
+    string | undefined | MDSResObj<Transaction>
   >()
 
   const form = useForm<ManualConsolidationFormValues>({

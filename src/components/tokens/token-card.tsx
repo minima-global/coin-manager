@@ -1,4 +1,9 @@
-import { Balance, Coin } from "@minima-global/mds"
+import {
+  Balance,
+  BalanceWithTokenDetails,
+  Coin,
+  MDSResObj,
+} from "@minima-global/mds"
 import { Link } from "@tanstack/react-router"
 import { TokenDisplay } from "./token-display"
 import { CopyButton } from "../copy-button"
@@ -7,11 +12,11 @@ import { CoinInfoDialog } from "../dialogs/coin-info"
 import { cn } from "@/lib/utils"
 
 interface TokenCardProps {
-  token: Balance.BalanceWithTokenDetails
+  token: MDSResObj<BalanceWithTokenDetails[]>
   isLinkEnabled: boolean
   type: "showcase" | "token"
   totalCoins?: number
-  balance?: Balance.Balance
+  balance?: Balance[]
   tab?: string
 }
 
@@ -51,10 +56,10 @@ export function TokenCard({
 }
 
 interface TokenCardItemProps {
-  token: Balance.RawBalance
+  token: Balance
   type: "showcase" | "token"
   totalCoins?: number
-  balance?: Balance.Balance
+  balance?: Balance[]
   tab?: string
   onCopy: () => Promise<void>
 }
@@ -101,13 +106,7 @@ function TokenCardItem({
   )
 }
 
-function TokenIcon({
-  token,
-  isMinima,
-}: {
-  token: Balance.RawBalance
-  isMinima: boolean
-}) {
+function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
   if (isMinima) {
     return (
       <div className="w-[48px] h-[48px] border border-darkConstrast dark:border-grey80 rounded overflow-hidden">

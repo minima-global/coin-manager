@@ -76,11 +76,11 @@ async function consolidateCoins(
       maxcoins: values.maxInputs.toString(),
       burn: values.burn.toString(),
       maxsigs: values.maxSignatures.toString(),
+      dryrun: "true",
     },
   })
 
-  // @ts-ignore TODO: fix this
-  const pendingId = result.pendinguid as string
+  const pendingId = result.pendinguid
 
   if (result.error && !pendingId) {
     if (result.error.includes("TXPOW")) {
@@ -187,8 +187,7 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
     },
   })
 
-  // @ts-ignore TODO: fix this
-  const pendingId = post.pendinguid as string
+  const pendingId = post.pendinguid
 
   if (pendingId) {
     return Success(pendingId)

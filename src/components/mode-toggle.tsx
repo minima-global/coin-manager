@@ -5,6 +5,11 @@ import { useTheme } from "./theme-provider"
 export default function ModeToggle() {
   const { setTheme, theme } = useTheme()
 
+  function toggleTheme(e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation()
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
+
   return (
     <div
       aria-label={
@@ -15,7 +20,7 @@ export default function ModeToggle() {
       <div
         className="hidden iphone:block"
         aria-pressed={theme === "dark"}
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={toggleTheme}
       >
         <div
           className={`relative flex h-[32px] w-[32px] lg:h-[44px] lg:w-[44px] scale-100 items-center justify-center rounded-full border border-grey80 bg-white from-[#17191C] to-[#37393F] transition-all duration-75 hover:bg-grey10 active:scale-75 dark:border-mediumDarkContrast dark:bg-darkContrast dark:hover:bg-transparent dark:hover:bg-gradient-to-t`}

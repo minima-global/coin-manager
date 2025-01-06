@@ -2,6 +2,8 @@ import { useMinima } from "@/hooks/use-minima"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import CheckmarkIcon from "@/components/ui/icons"
 import { Fragment } from "react/jsx-runtime"
+import { useState, useEffect } from "react"
+import { validateToken } from "@/lib/minima/mds-functions"
 
 export const Route = createFileRoute("/")({
   component: TokenManager,
@@ -12,8 +14,32 @@ export const Route = createFileRoute("/")({
   },
 })
 
+interface TokenValidationStatus {
+  [tokenId: string]: boolean
+}
+
 export default function TokenManager() {
   const { balance } = useMinima()
+
+  const [validationStatus, setValidationStatus] =
+    useState<TokenValidationStatus>({})
+
+  useEffect(() => {
+    const validateTokens = async () => {
+      if (balance?.response) {
+        const validationResults: TokenValidationStatus = {}
+
+        for (const token of balance.response) {
+          const isValid = await validateToken(token.tokenid)
+          validationResults[token.tokenid] = isValid
+        }
+
+        setValidationStatus(validationResults)
+      }
+    }
+
+    validateTokens()
+  }, [balance])
 
   const tokenNameStyle =
     "font-bold truncate text-neutral-600 dark:text-neutral-400"
@@ -51,9 +77,11 @@ export default function TokenManager() {
                 <div className="overflow-hidden px-4">
                   <div className="flex">
                     <h6 className={tokenNameStyle}>Minima</h6>
-                    <div className="!text-blue-500 my-auto ml-1">
-                      <CheckmarkIcon fill="currentColor" size={16} />
-                    </div>
+                    {validationStatus[token.tokenid] && (
+                      <div className="!text-blue-500 my-auto ml-1">
+                        <CheckmarkIcon fill="currentColor" size={16} />
+                      </div>
+                    )}
                   </div>
 
                   <p className={tokenAmountStyle}>
@@ -121,10 +149,11 @@ export default function TokenManager() {
                         ? token.token.name
                         : "N/A"}
                     </h6>
-                    {/**TODO: Add validation */}
-                    <div className="!text-blue-500 my-auto ml-1">
-                      <CheckmarkIcon fill="currentColor" size={16} />
-                    </div>
+                    {validationStatus[token.tokenid] && (
+                      <div className="!text-blue-500 my-auto ml-1">
+                        <CheckmarkIcon fill="currentColor" size={16} />
+                      </div>
+                    )}
                   </div>
                   <p className={tokenAmountStyle}>
                     {token.confirmed.includes(".")

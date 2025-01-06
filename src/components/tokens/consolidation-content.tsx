@@ -1,37 +1,37 @@
-import { Button } from "@/components/ui/button"
-import { ChevronDownIcon } from "lucide-react"
-import { useState, useEffect, useContext } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ConsolidateForm } from "@/components/tokens/consolidate-form"
-import { useMutation } from "@tanstack/react-query"
+import { Button } from "@/components/ui/button";
+import { ChevronDownIcon } from "lucide-react";
+import { useState, useEffect, useContext } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ConsolidateForm } from "@/components/tokens/consolidate-form";
+import { useMutation } from "@tanstack/react-query";
 import {
   consolidateCoins,
   manualConsolidation,
-} from "@/lib/minima/mds-functions"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useParams } from "@tanstack/react-router"
-import { toast } from "sonner"
-import { MDSError } from "@/lib/error"
+} from "@/lib/minima/mds-functions";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { MDSError } from "@/lib/error";
 import {
   ConsolidationFormValues,
   manualConsolidationFormSchema,
   ManualConsolidationFormValues,
-} from "@/lib/schemas"
-import { consolidationFormSchema } from "@/lib/schemas"
-import { appContext } from "@/AppContext"
-import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog"
-import { CopyButton } from "../copy-button"
-import type { MDSResObj, Transaction } from "@minima-global/mds"
+} from "@/lib/schemas";
+import { consolidationFormSchema } from "@/lib/schemas";
+import { appContext } from "@/AppContext";
+import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
+import { CopyButton } from "../copy-button";
+import type { MDSResponse, Transaction } from "@minima-global/mds";
 
 export function ConsolidationContent() {
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
-  const [cliCommand, setCliCommand] = useState("")
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [cliCommand, setCliCommand] = useState("");
   const [consolidationData, setConsolidationData] = useState<
-    MDSResObj<Transaction> | string | undefined
-  >()
+    MDSResponse<Transaction> | string | undefined
+  >();
 
-  const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
+  const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId;
 
   // Consolidation form
   const form = useForm<ConsolidationFormValues>({
@@ -43,43 +43,43 @@ export function ConsolidationContent() {
       burn: 0,
       tokenId,
     },
-  })
+  });
 
   // Consolidation mutation
   const { mutate, isPending, isSuccess, error } = useMutation({
     mutationFn: (values: ConsolidationFormValues) => consolidateCoins(values),
     onSuccess: async (responseData) => {
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-      setConsolidationData(responseData.data)
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      setConsolidationData(responseData.data);
     },
     onError: (error) => {
       if (error instanceof MDSError && error.error_tag === "txpow_to_big") {
         toast.error(
-          "The transaction is too big to be consolidated. Please try again with fewer coins."
-        )
+          "The transaction is too big to be consolidated. Please try again with fewer coins.",
+        );
       }
     },
-  })
+  });
 
   // Handle the consolidation
   const handleConsolidate = (values: ConsolidationFormValues) => {
-    mutate(values)
-  }
+    mutate(values);
+  };
 
   // Generate the CLI command for the consolidation
   const generateCliCommand = (values: ConsolidationFormValues) => {
-    return `consolidate maxcoins:${values.maxInputs} coinage:${values.minConfirmations} maxsigs:${values.maxSignatures} burn:${values.burn} tokenid:${values.tokenId}`
-  }
+    return `consolidate maxcoins:${values.maxInputs} coinage:${values.minConfirmations} maxsigs:${values.maxSignatures} burn:${values.burn} tokenid:${values.tokenId}`;
+  };
 
   // Subscribe to form changes
   form.watch((values) => {
-    setCliCommand(generateCliCommand(values as ConsolidationFormValues))
-  })
+    setCliCommand(generateCliCommand(values as ConsolidationFormValues));
+  });
 
   // Initialize CLI command with default values
   useEffect(() => {
-    setCliCommand(generateCliCommand(form.getValues()))
-  }, [])
+    setCliCommand(generateCliCommand(form.getValues()));
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
@@ -137,22 +137,22 @@ export function ConsolidationContent() {
         </motion.div>
       </AnimatePresence>
     </div>
-  )
+  );
 }
 
 interface ManualConsolidationContentProps {
-  coinIds: string[]
-  onConsolidate?: () => void
+  coinIds: string[];
+  onConsolidate?: () => void;
 }
 
 export function ManualConsolidationContent({
   coinIds,
 }: ManualConsolidationContentProps) {
-  const { mdsEventData } = useContext(appContext)
-  const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId
+  const { mdsEventData } = useContext(appContext);
+  const tokenId = useParams({ from: "/tokens/$tokenId" }).tokenId;
   const [consolidationData, setConsolidationData] = useState<
-    string | undefined | MDSResObj<Transaction>
-  >()
+    string | undefined | MDSResponse<Transaction>
+  >();
 
   const form = useForm<ManualConsolidationFormValues>({
     resolver: zodResolver(manualConsolidationFormSchema),
@@ -160,23 +160,23 @@ export function ManualConsolidationContent({
       coinIds,
       tokenId,
     },
-  })
+  });
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: (values: ManualConsolidationFormValues) =>
       manualConsolidation(values.coinIds),
     onSuccess: async (responseData) => {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      setConsolidationData(responseData.data)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setConsolidationData(responseData.data);
     },
     onError: (error) => {
-      console.error(error)
+      console.error(error);
     },
-  })
+  });
 
   const handleSubmit = (values: ManualConsolidationFormValues) => {
-    mutate(values)
-  }
+    mutate(values);
+  };
 
   return (
     <form
@@ -326,5 +326,5 @@ export function ManualConsolidationContent({
         )}
       </AnimatePresence>
     </form>
-  )
+  );
 }

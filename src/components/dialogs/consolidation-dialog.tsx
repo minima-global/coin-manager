@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerClose,
@@ -17,20 +17,20 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { ManualConsolidationContent } from "@/components/tokens/consolidation-content"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import { motion } from "framer-motion"
-import { useContext } from "react"
-import { appContext } from "@/AppContext"
-import type { MDSResObj, Transaction } from "@minima-global/mds"
+} from "@/components/ui/drawer";
+import { ManualConsolidationContent } from "@/components/tokens/consolidation-content";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { motion } from "framer-motion";
+import { useContext } from "react";
+import { appContext } from "@/AppContext";
+import type { MDSResponse, Transaction } from "@minima-global/mds";
 
 interface ConsolidationDialogProps {
-  disabled?: boolean
-  error: Error | null
-  isPending: boolean
-  consolidationData: MDSResObj<Transaction> | string | undefined
-  isSuccess: boolean
+  disabled?: boolean;
+  error: Error | null;
+  isPending: boolean;
+  consolidationData: MDSResponse<Transaction> | string | undefined;
+  isSuccess: boolean;
 }
 
 export function ConsolidationDialog({
@@ -40,8 +40,8 @@ export function ConsolidationDialog({
   consolidationData,
   isSuccess,
 }: ConsolidationDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-  const { mdsEventData } = useContext(appContext)
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const { mdsEventData } = useContext(appContext);
 
   const consolidationContent = (
     <>
@@ -192,7 +192,7 @@ export function ConsolidationDialog({
         </motion.div>
       )}
     </>
-  )
+  );
 
   if (isDesktop) {
     return (
@@ -216,7 +216,7 @@ export function ConsolidationDialog({
           {consolidationContent}
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -247,19 +247,19 @@ export function ConsolidationDialog({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }
 
 interface ManualConsolidationDialogProps {
-  coinIds: string[]
-  onConsolidate?: () => void
+  coinIds: string[];
+  onConsolidate?: () => void;
 }
 
 export function ManualConsolidationDialog({
   coinIds,
   onConsolidate,
 }: ManualConsolidationDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
     return (
@@ -280,7 +280,7 @@ export function ManualConsolidationDialog({
           <ManualConsolidationContent
             coinIds={coinIds}
             onConsolidate={() => {
-              onConsolidate?.()
+              onConsolidate?.();
             }}
           />
           <DialogClose asChild>
@@ -288,7 +288,7 @@ export function ManualConsolidationDialog({
               variant="outline"
               className="w-full bg-transparent hover:bg-transparent"
               onClick={() => {
-                onConsolidate?.()
+                onConsolidate?.();
               }}
             >
               Close
@@ -296,7 +296,7 @@ export function ManualConsolidationDialog({
           </DialogClose>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -318,7 +318,7 @@ export function ManualConsolidationDialog({
               variant="outline"
               className="w-full"
               onClick={() => {
-                onConsolidate?.()
+                onConsolidate?.();
               }}
             >
               Close
@@ -327,5 +327,5 @@ export function ManualConsolidationDialog({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

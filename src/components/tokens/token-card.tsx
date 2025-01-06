@@ -2,22 +2,22 @@ import {
   Balance,
   BalanceWithTokenDetails,
   Coin,
-  MDSResObj,
-} from "@minima-global/mds"
-import { Link } from "@tanstack/react-router"
-import { TokenDisplay } from "./token-display"
-import { CopyButton } from "../copy-button"
-import { Checkbox } from "../ui/checkbox"
-import { CoinInfoDialog } from "../dialogs/coin-info"
-import { cn } from "@/lib/utils"
+  MDSResponse,
+} from "@minima-global/mds";
+import { Link } from "@tanstack/react-router";
+import { TokenDisplay } from "./token-display";
+import { CopyButton } from "../copy-button";
+import { Checkbox } from "../ui/checkbox";
+import { CoinInfoDialog } from "../dialogs/coin-info";
+import { cn } from "@/lib/utils";
 
 interface TokenCardProps {
-  token: MDSResObj<BalanceWithTokenDetails[]>
-  isLinkEnabled: boolean
-  type: "showcase" | "token"
-  totalCoins?: number
-  balance?: Balance[]
-  tab?: string
+  token: MDSResponse<BalanceWithTokenDetails[]>;
+  isLinkEnabled: boolean;
+  type: "showcase" | "token";
+  totalCoins?: number;
+  balance?: Balance[];
+  tab?: string;
 }
 
 export function TokenCard({
@@ -29,8 +29,8 @@ export function TokenCard({
   tab,
 }: TokenCardProps) {
   const handleCopyToken = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(token, null, 2))
-  }
+    await navigator.clipboard.writeText(JSON.stringify(token, null, 2));
+  };
 
   const CardContent = (
     <>
@@ -46,22 +46,22 @@ export function TokenCard({
         />
       ))}
     </>
-  )
+  );
 
   return isLinkEnabled ? (
     <>{CardContent}</>
   ) : (
     <div className="w-full">{CardContent}</div>
-  )
+  );
 }
 
 interface TokenCardItemProps {
-  token: Balance
-  type: "showcase" | "token"
-  totalCoins?: number
-  balance?: Balance[]
-  tab?: string
-  onCopy: () => Promise<void>
+  token: Balance;
+  type: "showcase" | "token";
+  totalCoins?: number;
+  balance?: Balance[];
+  tab?: string;
+  onCopy: () => Promise<void>;
 }
 
 function TokenCardItem({
@@ -72,11 +72,11 @@ function TokenCardItem({
   tab,
   onCopy,
 }: TokenCardItemProps) {
-  const isMinima = token.tokenid === "0x00"
+  const isMinima = token.tokenid === "0x00";
   const tokenName =
     typeof token.token === "string"
       ? token.token
-      : token.token.name || "Unknown Token"
+      : token.token.name || "Unknown Token";
 
   return (
     <Link to="/tokens/$tokenId" params={{ tokenId: token.tokenid }}>
@@ -103,7 +103,7 @@ function TokenCardItem({
         )}
       </div>
     </Link>
-  )
+  );
 }
 
 function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
@@ -124,7 +124,7 @@ function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
           />
         </svg>
       </div>
-    )
+    );
   }
 
   return (
@@ -141,14 +141,14 @@ function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
         className="border-grey80 dark:border-mediumDarkContrast border rounded w-full h-full"
       />
     </div>
-  )
+  );
 }
 
 interface CoinCardProps {
-  coin: Coin
-  isSelected: boolean
-  onSelect: (id: string) => void
-  disabled?: boolean
+  coin: Coin;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  disabled?: boolean;
 }
 
 export const CoinCard = ({
@@ -162,7 +162,7 @@ export const CoinCard = ({
       <div
         className={cn(
           "flex flex-col dark:bg-darkContrast bg-grey10",
-          disabled ? "opacity-50" : ""
+          disabled ? "opacity-50" : "",
         )}
       >
         <div className="flex items-center justify-between p-4">
@@ -172,17 +172,17 @@ export const CoinCard = ({
               id={`token-${coin.coinid}`}
               checked={isSelected}
               onCheckedChange={() => {
-                onSelect(coin.coinid)
+                onSelect(coin.coinid);
               }}
               onClick={(e) => {
-                e.stopPropagation()
+                e.stopPropagation();
               }}
             />
           </div>
           <p className="text-xs truncate text-muted-foreground ml-2">
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
               )}
             >
               Coin ID:
@@ -204,5 +204,5 @@ export const CoinCard = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};

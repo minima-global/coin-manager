@@ -21,7 +21,7 @@ import { SplashScreen } from "./components/splash-screen.tsx"
 if (import.meta.env.MODE === "development") {
   MDS.DEBUG_HOST = import.meta.env.VITE_DEBUG_HOST
   MDS.DEBUG_PORT = parseInt(import.meta.env.VITE_DEBUG_MDS_PORT)
-  MDS.DEBUG_MINIDAPPID = import.meta.env.VITE_DEBUG_UID
+  MDS.DEBUG_MINIDAPPID = import.meta.env.VITE_DEBUG_SESSION_ID
 }
 
 const history = createHashHistory()

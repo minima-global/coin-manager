@@ -15,10 +15,9 @@ import { Button } from "@/components/ui/button"
 import { ConsolidationContent } from "@/components/tokens/consolidation-content"
 import { useState } from "react"
 import { Split } from "@/components/tokens/split"
-import { MDSResObj } from "@minima-global/mds"
+import { MDSResponse } from "@minima-global/mds"
 import { Coin } from "@minima-global/mds"
 
-// Define type for tab values
 type TabValue = "consolidate" | "split" | null
 
 export const Route = createFileRoute("/tokens/$tokenId")({
@@ -156,7 +155,7 @@ function Tokens() {
 }
 
 interface ConsolidateProps {
-  coins: MDSResObj<Coin[]>
+  coins: MDSResponse<Coin[]>
   disabled: boolean
 }
 

@@ -3,7 +3,7 @@ import {
   BalanceWithTokenDetails,
   Coin,
   MDS,
-  MDSResObj,
+  MDSResponse,
   Token,
   Transaction,
 } from "@minima-global/mds"
@@ -11,17 +11,19 @@ import { MDSError, Success } from "../error"
 import { ConsolidationFormValues } from "@/lib/schemas"
 import { SplitFormValues } from "@/lib/schemas"
 
-async function getBalance(): Promise<MDSResObj<Balance[]>> {
+async function getBalance(): Promise<MDSResponse<Balance[]>> {
   const balance = await MDS.cmd.balance()
   return balance
 }
 
-async function getCoins(): Promise<MDSResObj<Coin[]>> {
+async function getCoins(): Promise<MDSResponse<Coin[]>> {
   const coins = await MDS.cmd.coins()
   return coins
 }
 
-async function getCoinsByTokenId(tokenId: string): Promise<MDSResObj<Coin[]>> {
+async function getCoinsByTokenId(
+  tokenId: string
+): Promise<MDSResponse<Coin[]>> {
   const coins = await MDS.cmd.coins({
     params: { tokenid: tokenId, sendable: "true" },
   })
@@ -29,14 +31,14 @@ async function getCoinsByTokenId(tokenId: string): Promise<MDSResObj<Coin[]>> {
   return coins
 }
 
-async function getTokenById(tokenId: string): Promise<MDSResObj<Token>> {
+async function getTokenById(tokenId: string): Promise<MDSResponse<Token>> {
   const token = await MDS.cmd.tokens({ params: { tokenid: tokenId } })
   return token
 }
 
 async function checkConsolidation(
   values: ConsolidationFormValues
-): Promise<Success<string | MDSResObj<Transaction>>> {
+): Promise<Success<string | MDSResponse<Transaction>>> {
   const dryRunResult = await MDS.cmd.consolidate({
     params: {
       tokenid: values.tokenId,
@@ -66,7 +68,7 @@ async function checkConsolidation(
 
 async function consolidateCoins(
   values: ConsolidationFormValues
-): Promise<Success<string | MDSResObj<Transaction>>> {
+): Promise<Success<string | MDSResponse<Transaction>>> {
   await new Promise((resolve) => setTimeout(resolve, 3000))
 
   const result = await MDS.cmd.consolidate({
@@ -101,7 +103,7 @@ async function consolidateCoins(
 
 async function balanceByTokenId(
   tokenId: string
-): Promise<MDSResObj<BalanceWithTokenDetails[]>> {
+): Promise<MDSResponse<BalanceWithTokenDetails[]>> {
   const balance = await MDS.cmd.balance({
     params: { tokenid: tokenId, tokendetails: "true" },
   })
@@ -206,7 +208,7 @@ async function splitCoins(values: SplitFormValues): Promise<any> {
   }
 
   const MxAddress = address.response.miniaddress
-  let result: MDSResObj<Transaction>
+  let result: MDSResponse<Transaction>
 
   if (values.splitType === "perCoin") {
     const totalAmount = values.numberOfCoins * values.amountPerCoin
@@ -269,8 +271,28 @@ async function getAddress(): Promise<any> {
   return address
 }
 
+async function validateToken(tokenId: string): Promise<boolean> {
+  const res = await MDS.cmd.tokenvalidate({
+    params: {
+      tokenid: tokenId,
+    },
+  })
+
+  console.log(res)
+
+  if (!res.status) {
+    return true
+  }
+  if (res.response.web.valid) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export {
   manualConsolidation,
+  validateToken,
   getBalance,
   getCoins,
   getCoinsByTokenId,

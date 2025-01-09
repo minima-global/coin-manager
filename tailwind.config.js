@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       screens: {
-        iphone: "390px",
+        iphone: "300px",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -80,4 +80,4 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar-hide")],
-}
+};

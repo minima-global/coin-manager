@@ -10,6 +10,11 @@ import { CopyButton } from "../copy-button";
 import { Checkbox } from "../ui/checkbox";
 import { CoinInfoDialog } from "../dialogs/coin-info";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import {
+  fetchIPFSImageUri,
+  makeTokenImage,
+} from "@/lib/minima/make-token-image";
 
 interface TokenCardProps {
   token: MDSResponse<BalanceWithTokenDetails[]>;
@@ -107,6 +112,38 @@ function TokenCardItem({
 }
 
 function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
+  const [processedUrls, setProcessedUrls] = useState<{
+    [tokenId: string]: string;
+  }>({});
+
+  useEffect(() => {
+    const processTokenUrls = async () => {
+      if (token?.token) {
+        const urlResults: { [tokenId: string]: string } = {};
+
+        if (
+          typeof token.token === "object" &&
+          "url" in token.token &&
+          token.token.url
+        ) {
+          let url = decodeURIComponent(token.token.url);
+          if (url.startsWith("<artimage>", 0)) {
+            url = makeTokenImage(url, token.tokenid) || url;
+          } else if (url.startsWith("https://ipfs.io/ipns/")) {
+            url = (await fetchIPFSImageUri(url)) || url;
+          }
+          urlResults[token.tokenid] = url;
+        } else {
+          urlResults[token.tokenid] = `https://robohash.org/${token.tokenid}`;
+        }
+
+        setProcessedUrls(urlResults);
+      }
+    };
+
+    processTokenUrls();
+  }, [token]);
+
   if (isMinima) {
     return (
       <div className="w-[48px] h-[48px] border border-darkConstrast dark:border-grey80 rounded overflow-hidden">
@@ -132,11 +169,8 @@ function TokenIcon({ token, isMinima }: { token: Balance; isMinima: boolean }) {
       <img
         alt="token-icon"
         src={
-          typeof token.token === "object" &&
-          "url" in token.token &&
-          token.token.url.length
-            ? decodeURIComponent(token.token.url)
-            : `https://robohash.org/${token.tokenid}`
+          processedUrls[token.tokenid] ||
+          `https://robohash.org/${token.tokenid}`
         }
         className="border-grey80 dark:border-mediumDarkContrast border rounded w-full h-full"
       />
@@ -162,7 +196,7 @@ export const CoinCard = ({
       <div
         className={cn(
           "flex flex-col dark:bg-darkContrast bg-grey10",
-          disabled ? "opacity-50" : "",
+          disabled ? "opacity-50" : ""
         )}
       >
         <div className="flex items-center justify-between p-4">
@@ -182,7 +216,7 @@ export const CoinCard = ({
           <p className="text-xs truncate text-muted-foreground ml-2">
             <span
               className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]",
+                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
               )}
             >
               Coin ID:

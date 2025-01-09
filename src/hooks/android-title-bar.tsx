@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 export const useAndroidShowTitleBar = () => {
-  const [isMinimaBrowser, setIsMinimaBrowser] = useState(false)
+  const [isMinimaBrowser, setIsMinimaBrowser] = useState(false);
 
   const openTitleBar = () => {
-    if (!isMinimaBrowser) return
+    if (!isMinimaBrowser) return;
     // @ts-ignore
-    window.Android.showTitleBar()
-  }
+    window.Android.showTitleBar();
+  };
 
   useEffect(() => {
     if (window.navigator.userAgent.includes("Minima Browser")) {
-      setIsMinimaBrowser(true)
+      setIsMinimaBrowser(true);
     }
-  }, [])
+  }, []);
 
-  return { openTitleBar, isMinimaBrowser }
-}
+  return { openTitleBar, isMinimaBrowser };
+};
 
-export default useAndroidShowTitleBar
+export default useAndroidShowTitleBar;

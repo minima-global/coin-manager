@@ -1,56 +1,94 @@
-import { useMinima } from "@/hooks/use-minima"
-import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import CheckmarkIcon from "@/components/ui/icons"
-import { Fragment } from "react/jsx-runtime"
-import { useState, useEffect } from "react"
-import { validateToken } from "@/lib/minima/mds-functions"
+import { useMinima } from "@/hooks/use-minima";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import CheckmarkIcon from "@/components/ui/icons";
+import { Fragment } from "react/jsx-runtime";
+import { useState, useEffect } from "react";
+import { validateToken } from "@/lib/minima/mds-functions";
+import {
+  fetchIPFSImageUri,
+  makeTokenImage,
+} from "@/lib/minima/make-token-image";
 
 export const Route = createFileRoute("/")({
   component: TokenManager,
   beforeLoad: () => {
     if (!localStorage.getItem("hasSeenSplash")) {
-      return redirect({ to: "/info" })
+      return redirect({ to: "/info" });
     }
   },
-})
+});
 
 interface TokenValidationStatus {
-  [tokenId: string]: boolean
+  [tokenId: string]: boolean;
 }
 
 export default function TokenManager() {
-  const { balance } = useMinima()
+  const { balance } = useMinima();
 
   const [validationStatus, setValidationStatus] =
-    useState<TokenValidationStatus>({})
+    useState<TokenValidationStatus>({});
+
+  const [processedUrls, setProcessedUrls] = useState<{
+    [tokenId: string]: string;
+  }>({});
 
   useEffect(() => {
     const validateTokens = async () => {
       if (balance?.response) {
-        const validationResults: TokenValidationStatus = {}
+        const validationResults: TokenValidationStatus = {};
 
         for (const token of balance.response) {
-          const isValid = await validateToken(token.tokenid)
-          validationResults[token.tokenid] = isValid
+          const isValid = await validateToken(token.tokenid);
+          validationResults[token.tokenid] = isValid;
         }
 
-        setValidationStatus(validationResults)
+        setValidationStatus(validationResults);
       }
-    }
+    };
 
-    validateTokens()
-  }, [balance])
+    validateTokens();
+  }, [balance]);
+
+  useEffect(() => {
+    const processTokenUrls = async () => {
+      if (balance?.response) {
+        const urlResults: { [tokenId: string]: string } = {};
+
+        for (const token of balance.response) {
+          if (
+            typeof token.token === "object" &&
+            "url" in token.token &&
+            token.token.url
+          ) {
+            let url = decodeURIComponent(token.token.url);
+            if (url.startsWith("<artimage>", 0)) {
+              url = makeTokenImage(url, token.tokenid) || url;
+            } else if (url.startsWith("https://ipfs.io/ipns/")) {
+              url = (await fetchIPFSImageUri(url)) || url;
+            }
+            urlResults[token.tokenid] = url;
+          } else {
+            urlResults[token.tokenid] = `https://robohash.org/${token.tokenid}`;
+          }
+        }
+
+        setProcessedUrls(urlResults);
+      }
+    };
+
+    processTokenUrls();
+  }, [balance]);
 
   const tokenNameStyle =
-    "font-bold truncate text-neutral-600 dark:text-neutral-400"
+    "font-bold truncate text-neutral-600 dark:text-neutral-400";
   const tokenAmountStyle =
-    "font-bold truncate text-neutral-800 dark:text-neutral-300"
+    "font-bold truncate text-neutral-800 dark:text-neutral-300";
 
   return (
-    <div className="container mx-auto ">
+    <div className="w-full">
       <h1 className="text-2xl font-bold mb-4">Tokens</h1>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 w-full">
         {balance?.response.map((token) => (
           <Fragment key={token.tokenid}>
             {token.tokenid === "0x00" ? (
@@ -130,11 +168,8 @@ export default function TokenManager() {
                   <img
                     alt="token-icon"
                     src={
-                      typeof token.token === "object" &&
-                      "url" in token.token &&
-                      token.token.url.length
-                        ? decodeURIComponent(token.token.url)
-                        : `https://robohash.org/${token.tokenid}`
+                      processedUrls[token.tokenid] ||
+                      `https://robohash.org/${token.tokenid}`
                     }
                     className="border-grey80 dark:border-mediumDarkContrast border rounded w-full h-full"
                   />
@@ -197,7 +232,7 @@ export default function TokenManager() {
         ))}
       </div>
 
-      <div className=" absolute bottom-0 right-0 mr-10 z-0">
+      <div className="absolute bottom-0 right-0 mr-10 z-0">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="1123"
@@ -289,5 +324,5 @@ export default function TokenManager() {
         </svg>
       </div>
     </div>
-  )
+  );
 }

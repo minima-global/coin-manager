@@ -1,12 +1,12 @@
-import { cn } from "@/lib/utils"
-import { Balance } from "@minima-global/mds"
-import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils";
+import { Balance } from "@minima-global/mds";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TokenDisplayProps {
-  token: Balance
-  balance?: Balance[]
-  totalCoins?: number
-  tab?: string
+  token: Balance;
+  balance?: Balance[];
+  totalCoins?: number;
+  tab?: string;
 }
 
 export function TokenDisplay({
@@ -15,7 +15,7 @@ export function TokenDisplay({
   totalCoins,
   tab,
 }: TokenDisplayProps) {
-  const isUnconfirmedBalance = balance?.[0].unconfirmed !== "0"
+  const isUnconfirmedBalance = balance?.[0].unconfirmed !== "0";
 
   return (
     <div className="space-y-3">
@@ -93,13 +93,13 @@ export function TokenDisplay({
         isUnconfirmed={isUnconfirmedBalance}
       />
     </div>
-  )
+  );
 }
 
 interface BalanceDisplayProps {
-  label: string
-  value: string
-  isUnconfirmed: boolean
+  label: string;
+  value: string;
+  isUnconfirmed: boolean;
 }
 
 function BalanceDisplay({ label, value, isUnconfirmed }: BalanceDisplayProps) {
@@ -126,5 +126,5 @@ function BalanceDisplay({ label, value, isUnconfirmed }: BalanceDisplayProps) {
           : value
       )}
     </p>
-  )
+  );
 }

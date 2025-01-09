@@ -1,15 +1,15 @@
-import * as React from "react"
-import useAndroidShowTitleBar from "@/hooks/android-title-bar"
+import * as React from "react";
+import useAndroidShowTitleBar from "@/hooks/android-title-bar";
 
 const TitleBar = () => {
-  const { openTitleBar, isMinimaBrowser } = useAndroidShowTitleBar()
+  const { openTitleBar, isMinimaBrowser } = useAndroidShowTitleBar();
 
   const goHome = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation()
-    window.location.assign("/")
-  }
+    e.stopPropagation();
+    window.location.assign("/");
+  };
 
-  if (!isMinimaBrowser) return null
+  if (!isMinimaBrowser) return null;
 
   return (
     <div
@@ -44,7 +44,7 @@ const TitleBar = () => {
         <div className="col-span-6 flex items-center justify-end"></div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TitleBar
+export default TitleBar;

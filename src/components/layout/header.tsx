@@ -1,19 +1,22 @@
-import { useContext } from "react"
-import ModeToggle from "../mode-toggle"
-import { appContext } from "@/AppContext"
-import { Link } from "@tanstack/react-router"
-import useAndroidShowTitleBar from "@/hooks/android-title-bar"
+import { useContext } from "react";
+import ModeToggle from "../mode-toggle";
+import { appContext } from "@/AppContext";
+import { Link } from "@tanstack/react-router";
+import useAndroidShowTitleBar from "@/hooks/android-title-bar";
 
 const Header = () => {
-  const { topBlock } = useContext(appContext)
-  const { openTitleBar } = useAndroidShowTitleBar()
+  const { topBlock } = useContext(appContext);
+  const { openTitleBar } = useAndroidShowTitleBar();
 
   return (
     <header className="h-[64px] lg:h-[84px]">
       <div
         className={`h-full  border-[hsla(0, 0%, 100%, 1)] flex items-center border-b bg-white px-5 transition-all dark:bg-black header-border`}
       >
-        <div onClick={openTitleBar} className="container relative z-50 mx-auto">
+        <div
+          onClick={openTitleBar}
+          className="sm:container relative z-50 sm:mx-auto w-full"
+        >
           <div className="grid w-full grid-cols-12">
             <div className="col-span-4 flex items-center">
               <div className="flex items-center gap-5 text-xs">
@@ -70,10 +73,10 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
 
 const HomeIcon = () => {
   return (
@@ -110,8 +113,8 @@ const HomeIcon = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const InfoIcon = () => {
   return (
@@ -149,5 +152,5 @@ const InfoIcon = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

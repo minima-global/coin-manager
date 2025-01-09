@@ -1,16 +1,16 @@
-import { motion } from "framer-motion"
-import { useRef, useState, MouseEvent } from "react"
+import { motion } from "framer-motion";
+import { useRef, useState, MouseEvent } from "react";
 
 interface NavProps {
-  activeTab: "auto" | "manual" | "total" | "perCoin" | "custom" | null
+  activeTab: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
   setActiveTab: (
     tab: "auto" | "manual" | "total" | "perCoin" | "custom"
-  ) => void
+  ) => void;
   setHoveredLink: (
     link: "auto" | "manual" | "total" | "perCoin" | "custom" | null
-  ) => void
-  hoveredLink: "auto" | "manual" | "total" | "perCoin" | "custom" | null
-  mode?: "consolidate" | "split"
+  ) => void;
+  hoveredLink: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
+  mode?: "consolidate" | "split";
 }
 
 const styles = `
@@ -22,7 +22,7 @@ const styles = `
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
-`
+`;
 
 export const Nav = ({
   activeTab,
@@ -31,47 +31,47 @@ export const Nav = ({
   hoveredLink,
   mode = "consolidate",
 }: NavProps) => {
-  const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [scrollLeft, setScrollLeft] = useState(0)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const previousLink = useRef<
     "auto" | "manual" | "total" | "perCoin" | "custom" | null
-  >(null)
+  >(null);
 
   const handleMouseEnter = (
     link: "auto" | "manual" | "total" | "perCoin" | "custom"
   ) => {
-    previousLink.current = hoveredLink
-    setHoveredLink(link)
-  }
+    previousLink.current = hoveredLink;
+    setHoveredLink(link);
+  };
 
   const handleMouseLeave = () => {
-    previousLink.current = hoveredLink
-    setHoveredLink(null)
-  }
+    previousLink.current = hoveredLink;
+    setHoveredLink(null);
+  };
 
   const handleMouseDown = (e: MouseEvent) => {
-    setIsDragging(true)
+    setIsDragging(true);
     if (scrollRef.current) {
-      setStartX(e.pageX - scrollRef.current.offsetLeft)
-      setScrollLeft(scrollRef.current.scrollLeft)
+      setStartX(e.pageX - scrollRef.current.offsetLeft);
+      setScrollLeft(scrollRef.current.scrollLeft);
     }
-  }
+  };
 
   const handleMouseUp = () => {
-    setIsDragging(false)
-  }
+    setIsDragging(false);
+  };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-    e.preventDefault()
+    if (!isDragging) return;
+    e.preventDefault();
     if (scrollRef.current) {
-      const x = e.pageX - scrollRef.current.offsetLeft
-      const walk = (x - startX) * 2
-      scrollRef.current.scrollLeft = scrollLeft - walk
+      const x = e.pageX - scrollRef.current.offsetLeft;
+      const walk = (x - startX) * 2;
+      scrollRef.current.scrollLeft = scrollLeft - walk;
     }
-  }
+  };
 
   const tabs =
     mode === "consolidate"
@@ -83,18 +83,18 @@ export const Nav = ({
           { id: "total" as const, label: "Split Total Amount" },
           { id: "perCoin" as const, label: "Split by Amount" },
           { id: "custom" as const, label: "Custom Split" },
-        ]
+        ];
 
   const getOffset = (index: number) => {
     if (mode === "split") {
-      return `calc(${index} * (33.333% + 146px))`
+      return `calc(${index} * (33.333% + 146px))`;
     }
-    return `${index * 100 + index * 16}%`
-  }
+    return `${index * 100 + index * 16}%`;
+  };
 
-  const styleSheet = document.createElement("style")
-  styleSheet.innerText = styles
-  document.head.appendChild(styleSheet)
+  const styleSheet = document.createElement("style");
+  styleSheet.innerText = styles;
+  document.head.appendChild(styleSheet);
 
   return (
     <div
@@ -172,5 +172,5 @@ export const Nav = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

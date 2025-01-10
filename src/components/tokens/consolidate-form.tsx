@@ -1,5 +1,5 @@
-import { UseFormReturn } from "react-hook-form"
-import { Input } from "@/components/ui/input"
+import { UseFormReturn } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -8,16 +8,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { AnimatePresence, motion } from "framer-motion"
-import { ConsolidationFormValues } from "@/lib/schemas"
-import { Info } from "lucide-react"
-import { Hint } from "../hint"
+} from "@/components/ui/form";
+import { AnimatePresence, motion } from "framer-motion";
+import { ConsolidationFormValues } from "@/lib/schemas";
+import { Info } from "lucide-react";
+import { Hint } from "../hint";
 
 interface ConsolidateFormProps {
-  onSubmit: (values: ConsolidationFormValues) => void
-  showAdvancedOptions: boolean
-  form: UseFormReturn<ConsolidationFormValues>
+  onSubmit: (values: ConsolidationFormValues) => void;
+  showAdvancedOptions: boolean;
+  form: UseFormReturn<ConsolidationFormValues>;
 }
 
 export function ConsolidateForm({
@@ -39,7 +39,9 @@ export function ConsolidateForm({
             <FormItem>
               <FormLabel>Max Coins</FormLabel>
               <FormDescription>
-                Enter the maximum number of coins to consolidate
+                The maximum number of coins to consolidate. The lowest value
+                coins will be prioritized. The consolidation will create two
+                equal value coins.
               </FormDescription>
               <FormControl>
                 <div className=" relative flex items-center">
@@ -55,7 +57,7 @@ export function ConsolidateForm({
                     <Hint
                       side="left"
                       align="center"
-                      label="Enter the maximum number of coins to consolidate"
+                      label="The maximum number of coins to consolidate. The lowest value coins will be prioritized. The consolidation will create two equal value coins."
                     >
                       <Info className=" h-4 w-4" />
                     </Hint>
@@ -95,7 +97,7 @@ export function ConsolidateForm({
                             <Hint
                               side="left"
                               align="center"
-                              label="Enter the minimum block confirmations required for the coins being consolidated"
+                              label="Only consolidate coins older than this many blocks."
                             >
                               <Info className=" h-4 w-4" />
                             </Hint>
@@ -125,7 +127,7 @@ export function ConsolidateForm({
                             <Hint
                               side="left"
                               align="center"
-                              label="Enter the maximum number of addresses to be used in the consolidation"
+                              label="The maximum number of signatures to be used in the transaction. This impacts the size of the transaction."
                             >
                               <Info className=" h-4 w-4" />
                             </Hint>
@@ -172,5 +174,5 @@ export function ConsolidateForm({
         </AnimatePresence>
       </form>
     </Form>
-  )
+  );
 }

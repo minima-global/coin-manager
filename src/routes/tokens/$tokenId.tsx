@@ -1,45 +1,45 @@
-import { useQueryState } from "nuqs"
-import { ManualConsolidationDialog } from "@/components/dialogs/consolidation-dialog"
-import { CoinCard, TokenCard } from "@/components/tokens/token-card"
-import { useMinima } from "@/hooks/use-minima"
-import { createFileRoute } from "@tanstack/react-router"
-import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeftIcon } from "lucide-react"
+import { useQueryState } from "nuqs";
+import { ManualConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
+import { CoinCard, TokenCard } from "@/components/tokens/token-card";
+import { useMinima } from "@/hooks/use-minima";
+import { createFileRoute } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeftIcon } from "lucide-react";
 import {
   ActionBarCloseTrigger,
   ActionBarContent,
   ActionBarRoot,
-} from "@/components/ui/action-bar"
-import { Nav } from "@/components/nav"
-import { Button } from "@/components/ui/button"
-import { ConsolidationContent } from "@/components/tokens/consolidation-content"
-import { useState } from "react"
-import { Split } from "@/components/tokens/split"
-import { MDSResponse } from "@minima-global/mds"
-import { Coin } from "@minima-global/mds"
+} from "@/components/ui/action-bar";
+import { Nav } from "@/components/nav";
+import { Button } from "@/components/ui/button";
+import { ConsolidationContent } from "@/components/tokens/consolidation-content";
+import { useState } from "react";
+import { Split } from "@/components/tokens/split";
+import { MDSResponse } from "@minima-global/mds";
+import { Coin } from "@minima-global/mds";
 
-type TabValue = "consolidate" | "split" | null
+type TabValue = "consolidate" | "split" | null;
 
 export const Route = createFileRoute("/tokens/$tokenId")({
   component: Tokens,
-})
+});
 
 function Tokens() {
-  const { tokenId } = Route.useParams()
-  const { coinsByTokenId, balanceByTokenIdQuery } = useMinima()
-  const { data: coins } = coinsByTokenId(tokenId)
-  const { data: balance } = balanceByTokenIdQuery(tokenId)
+  const { tokenId } = Route.useParams();
+  const { coinsByTokenId, balanceByTokenIdQuery } = useMinima();
+  const { data: coins } = coinsByTokenId(tokenId);
+  const { data: balance } = balanceByTokenIdQuery(tokenId);
 
   const [activeTab, setActiveTab] = useQueryState<TabValue>("tab", {
     defaultValue: null,
     parse: (value) => {
-      if (value === "consolidate" || value === "split") return value
-      return null
+      if (value === "consolidate" || value === "split") return value;
+      return null;
     },
     serialize: (value) => value || "",
-  })
+  });
 
-  if (!coins || !balance) return null
+  if (!coins || !balance) return null;
 
   return (
     <AnimatePresence mode="wait">
@@ -151,34 +151,34 @@ function Tokens() {
         </div>
       </motion.div>
     </AnimatePresence>
-  )
+  );
 }
 
 interface ConsolidateProps {
-  coins: MDSResponse<Coin[]>
-  disabled: boolean
+  coins: MDSResponse<Coin[]>;
+  disabled: boolean;
 }
 
 const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
-  const [selectedTokens, setSelectedTokens] = useState<string[]>([])
+  const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<
     "auto" | "manual" | "total" | "perCoin" | "custom" | null
-  >("auto")
+  >("auto");
   const [hoveredLink, setHoveredLink] = useState<
     "auto" | "manual" | "total" | "perCoin" | "custom" | null
-  >(null)
+  >(null);
 
   const handleTokenSelect = (coinId: string) => {
     setSelectedTokens((prev) =>
       prev.includes(coinId)
         ? prev.filter((id) => id !== coinId)
         : [...prev, coinId]
-    )
-  }
+    );
+  };
 
   const closeActionBar = () => {
-    setSelectedTokens([])
-  }
+    setSelectedTokens([]);
+  };
 
   return (
     <div className="container mx-auto  max-w-2xl flex flex-col gap-4 pb-20">
@@ -235,7 +235,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
               open={selectedTokens.length > 0}
               onOpenChange={(e) => {
                 if (!e.open) {
-                  setSelectedTokens([])
+                  setSelectedTokens([]);
                 }
               }}
               closeOnInteractOutside={false}
@@ -252,8 +252,8 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
         </AnimatePresence>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
 const SplitCoins = () => {
   return (
@@ -266,5 +266,5 @@ const SplitCoins = () => {
       </div>
       <Split />
     </div>
-  )
-}
+  );
+};

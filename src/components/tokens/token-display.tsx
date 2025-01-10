@@ -120,11 +120,7 @@ function BalanceDisplay({ label, value, isUnconfirmed }: BalanceDisplayProps) {
       >
         {label}:
       </span>
-      {Number(
-        value.includes(".")
-          ? value.split(".")[0] + "." + value.split(".")[1].slice(0, 2)
-          : value
-      )}
+      {value}
     </p>
   );
 }

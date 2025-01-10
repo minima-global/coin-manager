@@ -82,7 +82,7 @@ export default function TokenManager() {
   const tokenNameStyle =
     "font-bold truncate text-neutral-600 dark:text-neutral-400";
   const tokenAmountStyle =
-    "font-bold truncate text-neutral-800 dark:text-neutral-300";
+    "font-bold truncate text-neutral-800 dark:text-neutral-300 max-w-[150px]";
 
   return (
     <div className="w-full">
@@ -122,13 +122,7 @@ export default function TokenManager() {
                     )}
                   </div>
 
-                  <p className={tokenAmountStyle}>
-                    {token.confirmed.includes(".")
-                      ? token.confirmed.split(".")[0] +
-                        "." +
-                        token.confirmed.split(".")[1].slice(0, 2)
-                      : token.confirmed}
-                  </p>
+                  <p className={tokenAmountStyle}>{token.confirmed}</p>
                 </div>
                 <div className="flex items-center justify-end flex-1">
                   <svg

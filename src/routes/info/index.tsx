@@ -11,23 +11,24 @@ function Info() {
       <h1 className="text-3xl font-semibold mb-8">Minima Coin Manager</h1>
       <div className="flex flex-col gap-4 w-full">
         <p className="text-primary text-base max-w-xl">
-          The Coin Manager app helps you efficiently organize your coins (or
-          UTXOs - Unspent Transaction Outputs) by consolidating or splitting
-          them as needed.
+          The Coin Manager app helps you organize your coins, or UTxOs (Unspent
+          Transaction Outputs) by consolidating or splitting them as needed.
+        </p>
+        <p className=" text-muted-foreground text-sm max-w-xl">
+          Your wallet balance is made up of multiple coins just like cash, and
+          coins can vary in amount. Coins of small value are known as 'dust' and
+          they can clutter your wallet and reduce node performance.
         </p>
         <p className="text-muted-foreground text-sm max-w-xl">
-          <span className="font-semibold text-primary">
-            Consolidating Coins
-          </span>{" "}
-          combines multiple small coins into larger ones. This is essential for
-          preventing “dust” - lots of tiny coins that clutter your wallet.
-          Consolidation helps streamline your transactions and improve
-          performance.
+          <span className="font-semibold text-primary">Consolidate Coins</span>{" "}
+          to combine smaller coins and prevent dust, improving node performance
+          and streamlining transactions.
         </p>
         <p className="text-muted-foreground text-sm max-w-xl">
-          <span className="font-semibold text-primary">Splitting</span> breaks
-          down larger coins into smaller amounts. This ensures you have multiple
-          coins available for transactions, improving convenience and usability.
+          <span className="font-semibold text-primary">Split Coins</span> to
+          break large value coins into smaller amounts. This ensures you have
+          multiple coins available for transactions, improving convenience and
+          usability.
         </p>
       </div>
 

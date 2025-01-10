@@ -1,5 +1,5 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form"
-import { Input } from "@/components/ui/input"
+import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -7,38 +7,38 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import { Info, Plus, Trash2 } from "lucide-react"
-import { getAddress } from "@/lib/minima/mds-functions"
-import { SplitFormValues } from "@/lib/schemas"
-import { Hint } from "../hint"
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Info, Plus, Trash2 } from "lucide-react";
+import { getAddress } from "@/lib/minima/mds-functions";
+import { SplitFormValues } from "@/lib/schemas";
+import { Hint } from "../hint";
 
 interface SplitFormProps {
-  onSubmit: (values: SplitFormValues) => void
-  form: UseFormReturn<SplitFormValues>
-  splitType: "total" | "perCoin" | "custom"
+  onSubmit: (values: SplitFormValues) => void;
+  form: UseFormReturn<SplitFormValues>;
+  splitType: "total" | "perCoin" | "custom";
 }
 
 export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "splits",
-  })
+  });
 
   const handleGenerateAddress = async (index: number) => {
     try {
-      const addressResponse = await getAddress()
+      const addressResponse = await getAddress();
       if (!addressResponse.error) {
         form.setValue(
           `splits.${index}.address`,
           addressResponse.response.miniaddress
-        )
+        );
       }
     } catch (error) {
-      console.error("Error generating address:", error)
+      console.error("Error generating address:", error);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -255,7 +255,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                               <Hint
                                 side="left"
                                 align="center"
-                                label="Enter the amount of Minima or custom tokens to send to the specified address."
+                                label="Enter the total amount to split into separate coins."
                               >
                                 <Info className="h-4 w-4" />
                               </Hint>
@@ -285,7 +285,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               name="splitAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Split Amount</FormLabel>
+                  <FormLabel>Number of coins (each)</FormLabel>
                   <FormControl>
                     <div className=" relative flex items-center">
                       <Input
@@ -299,7 +299,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         <Hint
                           side="left"
                           align="center"
-                          label="Enter the amount to split to all addresses."
+                          label="Each recipient will receive their amount split into this number of coins"
                         >
                           <Info className="h-4 w-4" />
                         </Hint>
@@ -314,5 +314,5 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
         )}
       </form>
     </Form>
-  )
+  );
 }

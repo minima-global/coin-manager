@@ -1,7 +1,7 @@
 {
   "name": "my-coins",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "template": "react-ts",
   "type": "module",
   "description": "Coin Manager - manage your coins",

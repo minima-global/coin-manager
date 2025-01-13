@@ -24,7 +24,11 @@ import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
 import { CopyButton } from "../copy-button";
 import type { MDSResponse, Transaction } from "@minima-global/mds";
 
-export function ConsolidationContent() {
+interface ConsolidationContentProps {
+  disabled: boolean;
+}
+
+export function ConsolidationContent({ disabled }: ConsolidationContentProps) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [cliCommand, setCliCommand] = useState("");
   const [consolidationData, setConsolidationData] = useState<
@@ -55,7 +59,7 @@ export function ConsolidationContent() {
     onError: (error) => {
       if (error instanceof MDSError && error.error_tag === "txpow_to_big") {
         toast.error(
-          "The transaction is too big to be consolidated. Please try again with fewer coins.",
+          "The transaction is too big to be consolidated. Please try again with fewer coins."
         );
       }
     },
@@ -128,7 +132,7 @@ export function ConsolidationContent() {
           </div>
 
           <ConsolidationDialog
-            disabled={isPending}
+            disabled={isPending || disabled}
             error={error}
             isPending={isPending}
             consolidationData={consolidationData}

@@ -68,7 +68,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         <Hint
                           side="left"
                           align="center"
-                          label="Enter the amount of Minima or custom tokens to send to the specified address."
+                          label="Enter the total amount to split into separate coins."
                         >
                           <Info className="h-4 w-4" />
                         </Hint>

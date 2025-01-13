@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react"
-
+import { useEffect, useState } from "react";
+import packageJson from "../../package.json";
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(() => {
-    return !localStorage.getItem("hasSeenSplash")
-  })
+    return !localStorage.getItem("hasSeenSplash");
+  });
 
   useEffect(() => {
     if (isVisible) {
       setTimeout(() => {
-        setIsVisible(false)
-        localStorage.setItem("hasSeenSplash", "true")
-      }, 3000)
+        setIsVisible(false);
+        localStorage.setItem("hasSeenSplash", "true");
+      }, 3000);
     }
-  }, [])
+  }, []);
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
+
+  const version = packageJson.version;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-background z-[9999] flex-col gap-4 top-20">
@@ -26,7 +28,7 @@ export function SplashScreen() {
         className="invert dark:invert-0"
       />
       <h1 className="text-primary text-2xl font-bold">Minima Coin Manager</h1>
-      <span className="text-muted-foreground text-sm">Version 0.3.0</span>
+      <span className="text-muted-foreground text-sm">Version {version}</span>
     </div>
-  )
+  );
 }

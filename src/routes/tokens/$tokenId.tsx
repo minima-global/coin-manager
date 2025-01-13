@@ -200,7 +200,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
               (Must have at least 3 coins)
             </span>
           </div>
-          <ConsolidationContent />
+          <ConsolidationContent disabled={disabled} />
         </>
       ) : activeTab === "manual" ? (
         <AnimatePresence>

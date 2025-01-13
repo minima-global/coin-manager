@@ -1,41 +1,48 @@
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { CheckIcon, CircleCheck, CopyIcon } from "lucide-react"
-import { Button } from "./ui/button"
-import { Hint } from "./hint"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { CheckIcon, CircleCheck, CopyIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { Hint } from "./hint";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface CopyButtonProps {
-  onCopy?: () => Promise<void>
+  onCopy?: () => Promise<void>;
+  label?: string;
+  className?: string;
 }
 
-export function CopyButton({ onCopy }: CopyButtonProps) {
-  const [isCopied, setIsCopied] = useState(false)
+export function CopyButton({
+  onCopy,
+  label = "Copy",
+  className,
+}: CopyButtonProps) {
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
-      if (onCopy) await onCopy()
-      setIsCopied(true)
+      if (onCopy) await onCopy();
+      setIsCopied(true);
       toast.success("Copied to clipboard", {
         icon: <CircleCheck className="w-4 h-4" />,
-      })
-      setTimeout(() => setIsCopied(false), 4000)
+      });
+      setTimeout(() => setIsCopied(false), 4000);
     } catch (error) {
-      setIsCopied(false)
+      setIsCopied(false);
     }
-  }
+  };
 
   return (
-    <Hint label="Copy">
+    <Hint label={label}>
       <Button
         variant="outline"
         onClick={handleCopy}
         className={cn(
-          "h-auto px-5  transition-all duration-300",
+          "h-auto px-5 transition-all duration-300",
           isCopied
             ? "bg-[#4FE3C1] hover:bg-[#4FE3C1] text-black hover:text-black"
-            : "dark:bg-mediumDarkContrast bg-grey10 hover:bg-grey10"
+            : "dark:bg-mediumDarkContrast bg-grey10 hover:bg-grey10",
+          className
         )}
       >
         <motion.div
@@ -72,5 +79,5 @@ export function CopyButton({ onCopy }: CopyButtonProps) {
         </motion.div>
       </Button>
     </Hint>
-  )
+  );
 }

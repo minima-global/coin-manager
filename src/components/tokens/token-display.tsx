@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Balance } from "@minima-global/mds";
 import { motion, AnimatePresence } from "framer-motion";
+import { CopyButton } from "@/components/copy-button";
 
 interface TokenDisplayProps {
   token: Balance;
@@ -17,18 +18,30 @@ export function TokenDisplay({
 }: TokenDisplayProps) {
   const isUnconfirmedBalance = balance?.[0].unconfirmed !== "0";
 
+  const copyTokenId = async () => {
+    await navigator.clipboard.writeText(token.tokenid);
+  };
+
   return (
     <div className="space-y-3">
-      <p className="text-sm truncate text-muted-foreground">
-        <span
-          className={cn(
-            "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
-          )}
-        >
-          Token ID:
-        </span>
-        {token.tokenid}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm truncate text-muted-foreground flex-1">
+          <span
+            className={cn(
+              "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
+            )}
+          >
+            Token ID:
+          </span>
+          {token.tokenid}
+        </p>
+        <CopyButton
+          label="Copy Token ID"
+          onCopy={copyTokenId}
+          className="h-7 px-2.5 text-xs"
+        />
+      </div>
+
       <div className="w-full h-[1px] bg-border" />
 
       <AnimatePresence>
@@ -41,21 +54,25 @@ export function TokenDisplay({
           >
             {typeof token.token === "object" && (
               <>
-                <p className="text-sm text-muted-foreground">
-                  <span
-                    className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
-                    )}
-                  >
-                    Description:
-                  </span>
-                  {token.token.description}
-                </p>
-                <div className="w-full h-[1px] bg-border" />
+                {token.token.description && (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      <span
+                        className={cn(
+                          "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
+                        )}
+                      >
+                        Description:
+                      </span>
+                      {token.token.description}
+                    </p>
+                    <div className="w-full h-[1px] bg-border" />
+                  </>
+                )}
               </>
             )}
 
-            {totalCoins && (
+            {totalCoins && totalCoins > 0 ? (
               <>
                 <p className="text-sm text-muted-foreground">
                   <span
@@ -66,6 +83,20 @@ export function TokenDisplay({
                     Total Coins:
                   </span>
                   {totalCoins}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
+                    )}
+                  >
+                    Total Coins:
+                  </span>
+                  No coins found
                 </p>
                 <div className="w-full h-[1px] bg-border" />
               </>

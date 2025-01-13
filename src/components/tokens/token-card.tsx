@@ -4,7 +4,6 @@ import {
   Coin,
   MDSResponse,
 } from "@minima-global/mds";
-import { Link } from "@tanstack/react-router";
 import { TokenDisplay } from "./token-display";
 import { CopyButton } from "../copy-button";
 import { Checkbox } from "../ui/checkbox";
@@ -84,7 +83,7 @@ function TokenCardItem({
       : token.token.name || "Unknown Token";
 
   return (
-    <Link to="/tokens/$tokenId" params={{ tokenId: token.tokenid }}>
+    <div>
       <div className="flex items-center justify-between w-full cursor-pointer bg-grey10 dark:bg-darkContrast relative p-3 rounded mb-2">
         <div className="flex items-center space-x-2">
           <TokenIcon token={token} isMinima={isMinima} />
@@ -107,7 +106,7 @@ function TokenCardItem({
           />
         )}
       </div>
-    </Link>
+    </div>
   );
 }
 

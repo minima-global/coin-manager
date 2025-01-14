@@ -28,8 +28,6 @@ async function getCoinsByTokenId(
     params: { tokenid: tokenId },
   });
 
-  console.log("TOTAL COINS", coins.response.length);
-
   return coins;
 }
 

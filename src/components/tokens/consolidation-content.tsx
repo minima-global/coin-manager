@@ -96,6 +96,7 @@ export function ConsolidationContent({ disabled }: ConsolidationContentProps) {
           className="flex flex-col gap-4"
         >
           <ConsolidateForm
+            disabled={disabled}
             form={form}
             onSubmit={handleConsolidate}
             showAdvancedOptions={isOptionsOpen}

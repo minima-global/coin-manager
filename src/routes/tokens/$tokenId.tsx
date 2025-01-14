@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Split } from "@/components/tokens/split";
 import { MDSResponse } from "@minima-global/mds";
 import { Coin } from "@minima-global/mds";
+import { getDisabledCoins } from "@/lib/minima/get-disabled-coins";
 
 type TabValue = "consolidate" | "split" | null;
 
@@ -40,6 +41,8 @@ function Tokens() {
   });
 
   if (!coins || !balance) return null;
+
+  const disabledCoins = getDisabledCoins(balance, coins);
 
   return (
     <AnimatePresence mode="wait">
@@ -129,7 +132,10 @@ function Tokens() {
                 <div className="w-full">
                   <ConsolidateCoins
                     coins={coins}
-                    disabled={coins.response.length < 3}
+                    disabled={
+                      disabledCoins.has(coins.response[0].coinid) ||
+                      coins.response.length < 3
+                    }
                   />
                 </div>
               </motion.div>
@@ -144,7 +150,9 @@ function Tokens() {
                 transition={{ duration: 0.2 }}
                 className="w-full"
               >
-                <SplitCoins />
+                <SplitCoins
+                  disabled={disabledCoins.has(coins.response[0].coinid)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -167,6 +175,12 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
   const [hoveredLink, setHoveredLink] = useState<
     "auto" | "manual" | "total" | "perCoin" | "custom" | null
   >(null);
+
+  const { tokenId } = Route.useParams();
+  const { balanceByTokenIdQuery } = useMinima();
+  const { data: balance } = balanceByTokenIdQuery(tokenId);
+
+  const disabledCoins = getDisabledCoins(balance, coins);
 
   const handleTokenSelect = (coinId: string) => {
     setSelectedTokens((prev) =>
@@ -196,9 +210,16 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
             <p className="text-sm text-muted-foreground">
               Consolidate your coins automatically
             </p>
-            <span className="text-xs text-muted-foreground -mt-1">
-              (Must have at least 3 coins)
-            </span>
+            {disabled && (
+              <span className="text-xs text-rose-500">
+                You have no sendable coins
+              </span>
+            )}
+            {coins.response.length < 3 && !disabled && (
+              <span className="text-xs text-muted-foreground -mt-1">
+                (Must have at least 3 coins)
+              </span>
+            )}
           </div>
           <ConsolidationContent disabled={disabled} />
         </>
@@ -216,9 +237,17 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
               <p className="text-sm text-muted-foreground">
                 Select coins to consolidate
               </p>
-              <span className="text-xs text-muted-foreground -mt-1">
-                (Must have at least 3 coins)
-              </span>
+
+              {disabled && (
+                <span className="text-xs text-rose-500">
+                  You have no sendable coins
+                </span>
+              )}
+              {!disabled && (
+                <span className="text-xs text-muted-foreground -mt-1">
+                  (Must have at least 3 coins)
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               {coins?.response.map((coin) => (
@@ -228,6 +257,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
                   isSelected={selectedTokens.includes(coin.coinid)}
                   onSelect={handleTokenSelect}
                   disabled={disabled}
+                  isDisabled={disabledCoins.has(coin.coinid) || disabled}
                 />
               ))}
             </div>
@@ -255,7 +285,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
   );
 };
 
-const SplitCoins = () => {
+const SplitCoins = ({ disabled }: { disabled: boolean }) => {
   return (
     <div className="container mx-auto max-w-2xl flex flex-col gap-4 pb-20">
       <div className="flex flex-col gap-1">
@@ -263,8 +293,13 @@ const SplitCoins = () => {
         <p className="text-sm text-muted-foreground">
           Split your coins into smaller amounts
         </p>
+        {disabled && (
+          <span className="text-xs text-rose-500">
+            You have no sendable coins
+          </span>
+        )}
       </div>
-      <Split />
+      <Split disabled={disabled} />
     </div>
   );
 };

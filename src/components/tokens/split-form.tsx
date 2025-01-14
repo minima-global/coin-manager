@@ -18,9 +18,15 @@ interface SplitFormProps {
   onSubmit: (values: SplitFormValues) => void;
   form: UseFormReturn<SplitFormValues>;
   splitType: "total" | "perCoin" | "custom";
+  disabled: boolean;
 }
 
-export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
+export function SplitForm({
+  onSubmit,
+  form,
+  splitType,
+  disabled,
+}: SplitFormProps) {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "splits",
@@ -62,6 +68,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         type="number"
                         inputMode="numeric"
                         className="dark:bg-darkContrast bg-grey10"
+                        disabled={disabled}
                         {...field}
                       />
                       <div className="absolute right-2">
@@ -94,6 +101,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         inputMode="numeric"
                         className="dark:bg-darkContrast bg-grey10"
                         min={2}
+                        disabled={disabled}
                         {...field}
                       />
                       <div className=" absolute right-2">
@@ -127,6 +135,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         inputMode="numeric"
                         className="dark:bg-darkContrast bg-grey10"
                         min={2}
+                        disabled={disabled}
                         {...field}
                       />
                       <div className=" absolute right-2">
@@ -157,6 +166,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         type="number"
                         inputMode="numeric"
                         className="dark:bg-darkContrast bg-grey10"
+                        disabled={disabled}
                         {...field}
                       />
                       <div className=" absolute right-2">
@@ -194,6 +204,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                                   type="text"
                                   inputMode="text"
                                   className="dark:bg-darkContrast bg-grey10"
+                                  disabled={disabled}
                                   {...field}
                                 />
                                 <div className=" absolute right-2 z-10 bg-grey10 dark:bg-darkContrast  flex items-center top-1 bottom-1">
@@ -214,6 +225,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                             size="sm"
                             onClick={() => handleGenerateAddress(index)}
                             className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 "
+                            disabled={disabled}
                           >
                             Use one of my addresses
                           </Button>
@@ -229,6 +241,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         size="icon"
                         className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 mt-8 px-4"
                         onClick={() => remove(index)}
+                        disabled={disabled}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -248,6 +261,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                               inputMode="numeric"
                               className="dark:bg-darkContrast bg-grey10"
                               step="0.000001"
+                              disabled={disabled}
                               {...field}
                               value={field.value || 0}
                             />
@@ -275,6 +289,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               size="sm"
               className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40"
               onClick={() => append({ address: "", amount: 0 })}
+              disabled={disabled}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Split
@@ -293,6 +308,7 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                         inputMode="numeric"
                         className="dark:bg-darkContrast bg-grey10"
                         step="0.000001"
+                        disabled={disabled}
                         {...field}
                       />
                       <div className=" absolute right-2">

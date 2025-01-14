@@ -18,12 +18,14 @@ interface ConsolidateFormProps {
   onSubmit: (values: ConsolidationFormValues) => void;
   showAdvancedOptions: boolean;
   form: UseFormReturn<ConsolidationFormValues>;
+  disabled: boolean;
 }
 
 export function ConsolidateForm({
   onSubmit,
   showAdvancedOptions,
   form,
+  disabled,
 }: ConsolidateFormProps) {
   return (
     <Form {...form}>
@@ -46,6 +48,7 @@ export function ConsolidateForm({
               <FormControl>
                 <div className=" relative flex items-center">
                   <Input
+                    disabled={disabled}
                     type="number"
                     inputMode="numeric"
                     className="dark:bg-darkContrast bg-grey10"
@@ -88,6 +91,7 @@ export function ConsolidateForm({
                       <FormControl>
                         <div className=" relative flex items-center">
                           <Input
+                            disabled={disabled}
                             type="number"
                             inputMode="numeric"
                             className="dark:bg-lightDarkContrast bg-grey20"
@@ -118,6 +122,7 @@ export function ConsolidateForm({
                       <FormControl>
                         <div className=" relative flex items-center">
                           <Input
+                            disabled={disabled}
                             type="number"
                             inputMode="numeric"
                             className="dark:bg-lightDarkContrast bg-grey20"
@@ -148,6 +153,7 @@ export function ConsolidateForm({
                       <FormControl>
                         <div className=" relative flex items-center">
                           <Input
+                            disabled={disabled}
                             type="number"
                             inputMode="numeric"
                             className="dark:bg-lightDarkContrast bg-grey20"

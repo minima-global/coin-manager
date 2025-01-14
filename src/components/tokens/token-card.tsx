@@ -182,26 +182,27 @@ interface CoinCardProps {
   isSelected: boolean;
   onSelect: (id: string) => void;
   disabled?: boolean;
+  isDisabled?: boolean;
 }
 
 export const CoinCard = ({
   coin,
   isSelected,
   onSelect,
-  disabled,
+  isDisabled,
 }: CoinCardProps) => {
   return (
     <>
       <div
         className={cn(
           "flex flex-col dark:bg-darkContrast bg-grey10",
-          disabled ? "opacity-50" : ""
+          isDisabled ? "opacity-50" : ""
         )}
       >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-4">
             <Checkbox
-              disabled={disabled}
+              disabled={isDisabled}
               id={`token-${coin.coinid}`}
               checked={isSelected}
               onCheckedChange={() => {

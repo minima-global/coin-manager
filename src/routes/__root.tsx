@@ -1,36 +1,19 @@
-import ModeToggle from "@/components/mode-toggle"
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/router-devtools"
-import { Home } from "lucide-react"
+import Header from "@/components/layout/header";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 export const Route = createRootRoute({
   component: () => {
     return (
       <>
-        <div className="border-b border-muted mt-4 pb-2 px-4">
-          <div className="flex gap-2 container mx-auto max-w-2xl ">
-            <div className="flex gap-4 relative justify-between w-full">
-              <div className="flex gap-2">
-                <div className="relative p-2 rounded-lg transition-all duration-300 ease-in-out group  text-center hover:bg-muted justify-between w-fit">
-                  <Link
-                    to="/"
-                    className="[&.active]:font-medium [&.active]:text-foreground text-muted-foreground group-hover:text-foreground relative z-10 block text-sm transition-all duration-300 ease-in-out"
-                  >
-                    <Home className="h-6 w-6" />
-                  </Link>
-                </div>
-              </div>
-              <ModeToggle />
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-center items-center h-full mt-10 pb-10 px-4">
+        <Header />
+        <div className="lg:mt-[28px] lg:max-w-[650px] w-full p-4 rounded-lg sm:container sm:mx-auto">
           <Outlet />
         </div>
         {import.meta.env.MODE === "development" ? (
           <TanStackRouterDevtools />
         ) : null}
       </>
-    )
+    );
   },
-})
+});

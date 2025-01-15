@@ -1,44 +1,50 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form"
-import { Input } from "@/components/ui/input"
+import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import { Plus, Trash2 } from "lucide-react"
-import { getAddress } from "@/lib/minima/mds-functions"
-import { SplitFormValues } from "@/lib/schemas"
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Info, Plus, Trash2 } from "lucide-react";
+import { getAddress } from "@/lib/minima/mds-functions";
+import { SplitFormValues } from "@/lib/schemas";
+import { Hint } from "../hint";
 
 interface SplitFormProps {
-  onSubmit: (values: SplitFormValues) => void
-  form: UseFormReturn<SplitFormValues>
-  splitType: "total" | "perCoin" | "custom"
+  onSubmit: (values: SplitFormValues) => void;
+  form: UseFormReturn<SplitFormValues>;
+  splitType: "total" | "perCoin" | "custom";
+  disabled: boolean;
 }
 
-export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
+export function SplitForm({
+  onSubmit,
+  form,
+  splitType,
+  disabled,
+}: SplitFormProps) {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "splits",
-  })
+  });
 
   const handleGenerateAddress = async (index: number) => {
     try {
-      const addressResponse = await getAddress()
+      const addressResponse = await getAddress();
       if (!addressResponse.error) {
         form.setValue(
           `splits.${index}.address`,
           addressResponse.response.miniaddress
-        )
+        );
       }
     } catch (error) {
-      console.error("Error generating address:", error)
+      console.error("Error generating address:", error);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -55,12 +61,26 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
-                  <FormDescription>
-                    The amount of Minima or custom tokens to send to the
-                    specified address.
-                  </FormDescription>
+
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <div className=" relative flex items-center">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        className="dark:bg-darkContrast bg-grey10"
+                        disabled={disabled}
+                        {...field}
+                      />
+                      <div className="absolute right-2">
+                        <Hint
+                          side="left"
+                          align="center"
+                          label="Enter the total amount to split into separate coins."
+                        >
+                          <Info className="h-4 w-4" />
+                        </Hint>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -73,12 +93,27 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Split</FormLabel>
-                  <FormDescription>
-                    The amount being sent will be split into multiple coins of
-                    equal value.
-                  </FormDescription>
+
                   <FormControl>
-                    <Input type="number" min={2} {...field} />
+                    <div className=" relative flex items-center">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        className="dark:bg-darkContrast bg-grey10"
+                        min={2}
+                        disabled={disabled}
+                        {...field}
+                      />
+                      <div className=" absolute right-2">
+                        <Hint
+                          side="left"
+                          align="center"
+                          label="Enter the number of coins to split the amount into."
+                        >
+                          <Info className="h-4 w-4" />
+                        </Hint>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,11 +128,26 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Number of Coins</FormLabel>
-                  <FormDescription>
-                    The number of coins you would like to receive.
-                  </FormDescription>
                   <FormControl>
-                    <Input type="number" min={2} {...field} />
+                    <div className=" relative flex items-center">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        className="dark:bg-darkContrast bg-grey10"
+                        min={2}
+                        disabled={disabled}
+                        {...field}
+                      />
+                      <div className=" absolute right-2">
+                        <Hint
+                          side="left"
+                          align="center"
+                          label="Enter the number of coins you would like to receive."
+                        >
+                          <Info className="h-4 w-4" />
+                        </Hint>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,11 +160,25 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Amount per Coin</FormLabel>
-                  <FormDescription>
-                    The amount of Minima or custom tokens per coin.
-                  </FormDescription>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <div className=" relative flex items-center">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        className="dark:bg-darkContrast bg-grey10"
+                        disabled={disabled}
+                        {...field}
+                      />
+                      <div className=" absolute right-2">
+                        <Hint
+                          side="left"
+                          align="center"
+                          label="Enter the amount of Minima or custom tokens per coin."
+                        >
+                          <Info className="h-4 w-4" />
+                        </Hint>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,22 +199,53 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                           <FormLabel>Address {index + 1}</FormLabel>
                           <div className="space-y-2">
                             <FormControl>
-                              <Input {...field} />
+                              <div className=" relative flex items-center">
+                                <Input
+                                  type="text"
+                                  inputMode="text"
+                                  className="dark:bg-darkContrast bg-grey10"
+                                  disabled={disabled}
+                                  {...field}
+                                />
+                                <div className=" absolute right-2 z-10 bg-grey10 dark:bg-darkContrast  flex items-center top-1 bottom-1">
+                                  <Hint
+                                    side="left"
+                                    align="center"
+                                    label="Enter the address to send the split to."
+                                  >
+                                    <Info className="h-4 w-4" />
+                                  </Hint>
+                                </div>
+                              </div>
                             </FormControl>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleGenerateAddress(index)}
-                              className="w-full"
-                            >
-                              Use one of my addresses
-                            </Button>
                           </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleGenerateAddress(index)}
+                            className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 "
+                            disabled={disabled}
+                          >
+                            Use one of my addresses
+                          </Button>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40 mt-8 px-4"
+                        onClick={() => remove(index)}
+                        disabled={disabled}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
 
                   <FormField
@@ -160,37 +255,41 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
                       <FormItem>
                         <FormLabel>Amount</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            step="0.000001"
-                            {...field}
-                            value={field.value || 0}
-                          />
+                          <div className=" relative flex items-center">
+                            <Input
+                              type="number"
+                              inputMode="numeric"
+                              className="dark:bg-darkContrast bg-grey10"
+                              step="0.000001"
+                              disabled={disabled}
+                              {...field}
+                              value={field.value || 0}
+                            />
+                            <div className=" absolute right-2">
+                              <Hint
+                                side="left"
+                                align="center"
+                                label="Enter the total amount to split into separate coins."
+                              >
+                                <Info className="h-4 w-4" />
+                              </Hint>
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="mt-8"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             ))}
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full bg-grey40 dark:bg-mediumDarkContrast hover:bg-grey40"
               onClick={() => append({ address: "", amount: 0 })}
+              disabled={disabled}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Split
@@ -201,9 +300,27 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
               name="splitAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Split Amount (for all)</FormLabel>
+                  <FormLabel>Number of coins (each)</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.000001" {...field} />
+                    <div className=" relative flex items-center">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        className="dark:bg-darkContrast bg-grey10"
+                        step="0.000001"
+                        disabled={disabled}
+                        {...field}
+                      />
+                      <div className=" absolute right-2">
+                        <Hint
+                          side="left"
+                          align="center"
+                          label="Each recipient will receive their amount split into this number of coins"
+                        >
+                          <Info className="h-4 w-4" />
+                        </Hint>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -213,5 +330,5 @@ export function SplitForm({ onSubmit, form, splitType }: SplitFormProps) {
         )}
       </form>
     </Form>
-  )
+  );
 }

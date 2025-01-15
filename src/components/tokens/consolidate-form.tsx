@@ -1,5 +1,5 @@
-import { UseFormReturn } from "react-hook-form"
-import { Input } from "@/components/ui/input"
+import { UseFormReturn } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -8,27 +8,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { AnimatePresence, motion } from "framer-motion"
-import { ConsolidationFormValues } from "@/lib/schemas"
+} from "@/components/ui/form";
+import { AnimatePresence, motion } from "framer-motion";
+import { ConsolidationFormValues } from "@/lib/schemas";
+import { Info } from "lucide-react";
+import { Hint } from "../hint";
 
 interface ConsolidateFormProps {
-  onSubmit: (values: ConsolidationFormValues) => void
-  showAdvancedOptions: boolean
-  form: UseFormReturn<ConsolidationFormValues>
+  onSubmit: (values: ConsolidationFormValues) => void;
+  showAdvancedOptions: boolean;
+  form: UseFormReturn<ConsolidationFormValues>;
+  disabled: boolean;
 }
 
 export function ConsolidateForm({
   onSubmit,
   showAdvancedOptions,
   form,
+  disabled,
 }: ConsolidateFormProps) {
   return (
     <Form {...form}>
       <form
         id="consolidate-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-2"
+        className="space-y-5"
       >
         <FormField
           control={form.control}
@@ -37,10 +41,31 @@ export function ConsolidateForm({
             <FormItem>
               <FormLabel>Max Coins</FormLabel>
               <FormDescription>
-                Enter the maximum number of coins to consolidate
+                The maximum number of coins to consolidate. The lowest value
+                coins will be prioritized. The consolidation will create two
+                equal value coins.
               </FormDescription>
               <FormControl>
-                <Input type="number" min={1} max={20} {...field} />
+                <div className=" relative flex items-center">
+                  <Input
+                    disabled={disabled}
+                    type="number"
+                    inputMode="numeric"
+                    className="dark:bg-darkContrast bg-grey10"
+                    min={1}
+                    max={20}
+                    {...field}
+                  />
+                  <div className=" absolute right-2">
+                    <Hint
+                      side="left"
+                      align="center"
+                      label="The maximum number of coins to consolidate. The lowest value coins will be prioritized. The consolidation will create two equal value coins."
+                    >
+                      <Info className=" h-4 w-4" />
+                    </Hint>
+                  </div>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -54,7 +79,7 @@ export function ConsolidateForm({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="space-y-2"
+              className="space-y-2 bg-grey10 dark:bg-darkContrast p-4"
             >
               <div className="space-y-2">
                 <FormField
@@ -63,12 +88,25 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Coin Age</FormLabel>
-                      <FormDescription>
-                        Enter the minimum block confirmations required for the
-                        coins being consolidated
-                      </FormDescription>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <div className=" relative flex items-center">
+                          <Input
+                            disabled={disabled}
+                            type="number"
+                            inputMode="numeric"
+                            className="dark:bg-lightDarkContrast bg-grey20"
+                            {...field}
+                          />
+                          <div className=" absolute right-2">
+                            <Hint
+                              side="left"
+                              align="center"
+                              label="Only consolidate coins older than this many blocks."
+                            >
+                              <Info className=" h-4 w-4" />
+                            </Hint>
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -81,13 +119,25 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Max Signatures</FormLabel>
-                      <FormDescription>
-                        If your coins are split across multiple wallet
-                        addresses, enter the maximum number of addresses to be
-                        used in the consolidation.
-                      </FormDescription>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <div className=" relative flex items-center">
+                          <Input
+                            disabled={disabled}
+                            type="number"
+                            inputMode="numeric"
+                            className="dark:bg-lightDarkContrast bg-grey20"
+                            {...field}
+                          />
+                          <div className=" absolute right-2">
+                            <Hint
+                              side="left"
+                              align="center"
+                              label="The maximum number of signatures to be used in the transaction. This impacts the size of the transaction."
+                            >
+                              <Info className=" h-4 w-4" />
+                            </Hint>
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -100,11 +150,25 @@ export function ConsolidateForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Burn</FormLabel>
-                      <FormDescription>
-                        Enter a value of Minima to burn with the transaction
-                      </FormDescription>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <div className=" relative flex items-center">
+                          <Input
+                            disabled={disabled}
+                            type="number"
+                            inputMode="numeric"
+                            className="dark:bg-lightDarkContrast bg-grey20"
+                            {...field}
+                          />
+                          <div className=" absolute right-2">
+                            <Hint
+                              side="left"
+                              align="center"
+                              label="Enter a value of Minima to burn with the transaction"
+                            >
+                              <Info className=" h-4 w-4" />
+                            </Hint>
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -116,5 +180,5 @@ export function ConsolidateForm({
         </AnimatePresence>
       </form>
     </Form>
-  )
+  );
 }

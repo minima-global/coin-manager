@@ -14,12 +14,14 @@ import { ThemeProvider } from "./components/theme-provider.tsx"
 import { ChakraProvider } from "@chakra-ui/react"
 import { createSystem, defaultConfig } from "@chakra-ui/react"
 import { Toaster } from "@/components/ui/sonner"
+import { NuqsAdapter } from "nuqs/adapters/react"
+import { SplashScreen } from "./components/splash-screen.tsx"
 
 // Debug mode
 if (import.meta.env.MODE === "development") {
   MDS.DEBUG_HOST = import.meta.env.VITE_DEBUG_HOST
   MDS.DEBUG_PORT = parseInt(import.meta.env.VITE_DEBUG_MDS_PORT)
-  MDS.DEBUG_MINIDAPPID = import.meta.env.VITE_DEBUG_UID
+  MDS.DEBUG_MINIDAPPID = import.meta.env.VITE_DEBUG_SESSION_ID
 }
 
 const history = createHashHistory()
@@ -55,15 +57,26 @@ const client = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ChakraProvider value={system}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <QueryClientProvider client={client}>
-          <AppProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </AppProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ChakraProvider>
+    <NuqsAdapter>
+      <ChakraProvider value={system}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <QueryClientProvider client={client}>
+            <AppProvider>
+              <RouterProvider router={router} />
+              <SplashScreen />
+              <Toaster
+                toastOptions={{
+                  classNames: {
+                    toast: "dark:bg-darkContrast bg-grey10",
+                    success: "dark:text-[#4FE3C1] text-black",
+                    error: "dark:text-[#FF627E] text-black",
+                  },
+                }}
+              />
+            </AppProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ChakraProvider>
+    </NuqsAdapter>
   </React.StrictMode>
 )

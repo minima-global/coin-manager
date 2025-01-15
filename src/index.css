@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Roboto+Mono:wght@400&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,9 +31,64 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    --orange: hsla(19, 100%, 51%, 1);
+    --light-orange: hsla(25, 100%, 59%, 1);
+    --lighter-orange: hsla(32, 100%, 64%, 1);
+
+    --yellow: hsla(46, 80%, 84%, 1);
+
+    --dark-orange: hsla(20, 100%, 56%);
+    --green: hsla(166, 73%, 60%, 1);
+    --red: hsla(349, 100%, 69%, 1);
+
+    --blue: hsla(240, 100%, 65%);
+    --light-blue: hsla(239, 100%, 81%);
+
+    --grey: #90909d;
+
+    --dark-contrast: hsla(216, 10%, 10%, 1);
+    --medium-dark-contrast: hsla(210, 7%, 17%, 1);
+    --light-dark-contrast: hsla(225, 7%, 23%, 1);
+    --core-dark-contrast: hsla(200, 6%, 29%, 1);
+
+    --white: hsla(0, 0%, 100%, 1);
+    --black: hsl(220, 16%, 4%);
+    --grey-10: hsl(240, 5%, 96%);
+    --grey-20: hsla(240, 5%, 92%, 1);
+    --grey-40: hsla(240, 6%, 84%, 1);
+    --grey-60: hsla(240, 4%, 48%, 1);
+    --grey-80: hsla(240, 5%, 67%, 1);
+    --grey-highlight: hsla(240, 12%, 22%, 1);
+
+    --main: hsla(47, 100%, 56%, 1);
+
+    font-family:
+      "Manrope",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      "Roboto",
+      "Oxygen",
+      "Ubuntu",
+      "Cantarell",
+      "Fira Sans",
+      "Droid Sans",
+      "Helvetica Neue",
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+    font-weight: 500;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
   }
   .dark {
-    --background: 0 0% 3.9%;
+    --background: 220 16% 4%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -65,4 +122,88 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html,
+body {
+  font-family: var(--font-manrope), sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  scroll-behavior: smooth;
+}
+
+.gradient-border {
+  --borderWidth: 3px;
+  position: relative;
+  border-radius: 16px;
+  padding: 4px 12px;
+}
+
+.gradient-border:after {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth) * 2);
+  background: linear-gradient(
+    60deg,
+    #f79533,
+    #f37055,
+    #ef4e7b,
+    #a166ab,
+    #5073b8,
+    #1098ad,
+    #07b39b,
+    #6fba82
+  );
+  border-radius: 16px;
+  z-index: -1;
+  animation: animatedgradient 2.5s ease alternate infinite;
+  background-size: 300% 300%;
+}
+
+@keyframes animatedgradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.header-border {
+  border-bottom: 2px solid;
+  border-image: linear-gradient(to right, #ff8630, #6162fb) 1;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0;
+}
+.gif {
+  background: url("../assets/loader3.gif") 50% / cover no-repeat;
+  background-blend-mode: color-dodge;
+  mix-blend-mode: normal;
+  background-color: inherit 50%;
+  height: 100px;
+  width: 100px;
+}
+
+.dark .gif {
+  background-color: var(--dark-contrast) 50%;
+  mix-blend-mode: lighten;
+}
+
+.splash-screen-exit {
+  opacity: 1;
+}
+
+.splash-screen-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
 }

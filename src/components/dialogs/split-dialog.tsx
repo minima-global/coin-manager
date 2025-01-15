@@ -1,13 +1,12 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 import {
   Drawer,
   DrawerClose,
@@ -17,34 +16,32 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
-import { ManualConsolidationContent } from "@/components/tokens/consolidation-content";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { motion } from "framer-motion";
-import { useContext } from "react";
-import { appContext } from "@/AppContext";
-import type { MDSResponse, Transaction } from "@minima-global/mds";
+} from "@/components/ui/drawer"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { AnimatePresence, motion } from "framer-motion"
+import { useContext } from "react"
+import { appContext } from "@/AppContext"
 
-interface ConsolidationDialogProps {
-  disabled?: boolean;
-  error: Error | null;
-  isPending: boolean;
-  consolidationData: MDSResponse<Transaction> | string | undefined;
-  isSuccess: boolean;
+interface SplitDialogProps {
+  disabled?: boolean
+  isPending: boolean
+  splitData: string | undefined
+  isSuccess: boolean
+  error: Error | null
 }
 
-export function ConsolidationDialog({
+export function SplitDialog({
   disabled,
-  error,
   isPending,
-  consolidationData,
+  splitData,
   isSuccess,
-}: ConsolidationDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const { mdsEventData } = useContext(appContext);
+  error,
+}: SplitDialogProps) {
+  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const { mdsEventData } = useContext(appContext)
 
-  const consolidationContent = (
-    <>
+  const splitContent = (
+    <AnimatePresence mode="wait">
       {isPending && (
         <motion.div
           key="loading"
@@ -54,9 +51,8 @@ export function ConsolidationDialog({
           className="flex flex-col items-center justify-center py-8"
         >
           <div className="gif bg-transparent invert dark:invert-0" />
-
           <p className="text-sm text-muted-foreground mt-2">
-            Consolidating your coins...
+            Splitting coins...
           </p>
         </motion.div>
       )}
@@ -99,14 +95,14 @@ export function ConsolidationDialog({
         </motion.div>
       )}
 
-      {isSuccess && consolidationData && (
+      {isSuccess && splitData && (
         <motion.div
           key="success"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.2 }}
-          className="flex flex-col items-center justify-center pt-2"
+          className="flex flex-col items-start justify-start py-8 pt-2 w-full"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -116,11 +112,11 @@ export function ConsolidationDialog({
               stiffness: 100,
               damping: 15,
             }}
-            className="flex flex-col items-center justify-center gap-2 mt-2"
+            className="flex flex-col items-center justify-canter gap-2 mt-2 w-full"
           >
-            {mdsEventData?.uid === consolidationData ? (
+            {mdsEventData?.uid === splitData ? (
               <>
-                {mdsEventData.accept ? (
+                {mdsEventData.accept && mdsEventData.status ? (
                   <div className="flex flex-col gap-2 items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -147,9 +143,11 @@ export function ConsolidationDialog({
                         ></path>
                       </g>
                     </svg>
-
                     <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
-                      Consolidation Successful!
+                      Split Successful!
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                      Your coins will be available to use shortly
                     </p>
                   </div>
                 ) : (
@@ -166,23 +164,29 @@ export function ConsolidationDialog({
                         d="M18.999 29.265q.595 0 .979-.383.383-.382.383-.977t-.383-.98q-.382-.383-.977-.383t-.979.383-.383.978.383.979q.382.383.977.383m-1.022-7.054h2.269V9.735h-2.269zm1.04 16.593q-3.948 0-7.395-1.496a19.4 19.4 0 0 1-6.038-4.086 19.3 19.3 0 0 1-4.087-6.039Q0 23.733 0 19.783q0-3.934 1.496-7.394t4.085-6.026q2.59-2.565 6.04-4.063Q15.07.804 19.02.804q3.933 0 7.394 1.496 3.46 1.495 6.026 4.06t4.063 6.032Q38 15.859 38 19.787q0 3.948-1.496 7.395t-4.06 6.028-6.032 4.088q-3.466 1.506-7.395 1.506m.008-2.27q6.96 0 11.833-4.888 4.872-4.889 4.872-11.867 0-6.96-4.863-11.833Q26.004 3.074 19 3.073q-6.954 0-11.843 4.864Q2.27 12.8 2.27 19.804q0 6.954 4.887 11.842 4.89 4.888 11.868 4.888"
                       ></path>
                     </svg>
-                    <p className="text-sm text-muted-foreground mt-2 text-red-400">
-                      Consolidation Failed!
-                    </p>
+                    {mdsEventData.result.message ? (
+                      <p className="text-sm text-muted-foreground mt-2 text-red-400">
+                        {mdsEventData.result.message}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground mt-2 text-red-400">
+                        Split Failed!
+                      </p>
+                    )}
                   </div>
                 )}
               </>
             ) : (
               <>
-                {typeof consolidationData === "string" &&
-                  mdsEventData?.uid !== consolidationData && (
+                {typeof splitData === "string" &&
+                  mdsEventData?.uid !== splitData && (
                     <div className="flex flex-col gap-2 items-center justify-center">
                       <div className="gif gif-dark my-4 invert dark:invert-0" />
                       <p className="text-sm text-muted-foreground mt-2">
-                        You must accept the consolidation in the pending app...
+                        You must accept the split in the pending app...
                       </p>
                       <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
-                        {consolidationData}
+                        {splitData}
                       </p>
                     </div>
                   )}
@@ -191,8 +195,8 @@ export function ConsolidationDialog({
           </motion.div>
         </motion.div>
       )}
-    </>
-  );
+    </AnimatePresence>
+  )
 
   if (isDesktop) {
     return (
@@ -200,23 +204,21 @@ export function ConsolidationDialog({
         <DialogTrigger asChild disabled={disabled}>
           <Button
             type="submit"
-            form="consolidate-form"
+            form="split-form"
             className="w-full bg-lightOrange hover:bg-lighterOrange transition-all duration-300 text-black"
           >
-            Consolidate
+            Split
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg dark:bg-darkContrast bg-grey10">
           <DialogHeader>
-            <DialogTitle>Consolidate</DialogTitle>
-            <DialogDescription>
-              Consolidate your coins automatically
-            </DialogDescription>
+            <DialogTitle>Split</DialogTitle>
+            <DialogDescription>Split your coins</DialogDescription>
           </DialogHeader>
-          {consolidationContent}
+          {splitContent}
         </DialogContent>
       </Dialog>
-    );
+    )
   }
 
   return (
@@ -224,21 +226,19 @@ export function ConsolidationDialog({
       <DrawerTrigger asChild disabled={disabled}>
         <Button
           type="submit"
-          form="consolidate-form"
+          form="split-form"
           className="w-full bg-lightOrange hover:bg-lighterOrange transition-all duration-300 text-black"
         >
-          Consolidate
+          Split
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Consolidate</DrawerTitle>
-          <DrawerDescription>
-            Consolidate your coins automatically
-          </DrawerDescription>
+          <DrawerTitle>Split</DrawerTitle>
+          <DrawerDescription>Split your coins</DrawerDescription>
         </DrawerHeader>
         <DrawerFooter>
-          {consolidationContent}
+          {splitContent}
           <DrawerClose asChild>
             <Button variant="outline" className="w-full">
               Close
@@ -247,85 +247,5 @@ export function ConsolidationDialog({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  );
-}
-
-interface ManualConsolidationDialogProps {
-  coinIds: string[];
-  onConsolidate?: () => void;
-}
-
-export function ManualConsolidationDialog({
-  coinIds,
-  onConsolidate,
-}: ManualConsolidationDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  if (isDesktop) {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            Consolidate {coinIds.length} coins
-          </Button>
-        </DialogTrigger>
-        <DialogContent className=" dark:bg-darkContrast bg-grey10">
-          <DialogHeader>
-            <DialogTitle>Manual Consolidate</DialogTitle>
-            <DialogDescription>
-              Consolidate {coinIds.length} selected coins
-            </DialogDescription>
-          </DialogHeader>
-
-          <ManualConsolidationContent
-            coinIds={coinIds}
-            onConsolidate={() => {
-              onConsolidate?.();
-            }}
-          />
-          <DialogClose asChild>
-            <Button
-              variant="outline"
-              className="w-full bg-transparent hover:bg-transparent"
-              onClick={() => {
-                onConsolidate?.();
-              }}
-            >
-              Close
-            </Button>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button variant="outline">Consolidate</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Manual Consolidate</DrawerTitle>
-          <DrawerDescription>
-            Consolidate {coinIds.length} selected coins
-          </DrawerDescription>
-        </DrawerHeader>
-        <DrawerFooter>
-          <ManualConsolidationContent coinIds={coinIds} />
-          <DrawerClose asChild>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                onConsolidate?.();
-              }}
-            >
-              Close
-            </Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  );
+  )
 }

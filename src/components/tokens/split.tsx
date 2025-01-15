@@ -12,11 +12,15 @@ import { MDSError } from "@/lib/error";
 
 import { Nav } from "@/components/nav";
 import { SplitDialog } from "../dialogs/split-dialog";
+import { MDSResponse } from "@minima-global/mds";
+import { Transaction } from "@minima-global/mds";
 
 type SplitType = "total" | "perCoin" | "custom";
 
 export function Split({ disabled }: { disabled: boolean }) {
-  const [splitData, setSplitData] = useState<string | undefined>(undefined);
+  const [splitData, setSplitData] = useState<
+    string | undefined | MDSResponse<Transaction>
+  >(undefined);
   const [splitType, setSplitType] = useState<SplitType>("total");
   const [hoveredLink, setHoveredLink] = useState<SplitType | null>(null);
 
@@ -107,6 +111,7 @@ export function Split({ disabled }: { disabled: boolean }) {
             hoveredLink={hoveredLink}
             setHoveredLink={handleHoveredLinkChange}
             mode="split"
+            disabled={disabled}
           />
 
           <motion.div

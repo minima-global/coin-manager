@@ -37,7 +37,7 @@ const AppProvider = ({ children }: IProps) => {
           setTopBlock(topBlock.response.block);
         } else if (event === MinimaEvents.PENDING) {
           setMdsEventData(data);
-          console.log("MDS PENDING", data);
+
           queryClient.invalidateQueries();
         } else if (event === MinimaEvents.NEWBLOCK) {
           setTopBlock(data.txpow.header.block);

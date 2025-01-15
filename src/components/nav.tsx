@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useRef, useState, MouseEvent } from "react";
+import { useRef, useState, MouseEvent, TouchEvent } from "react";
 
 interface NavProps {
   activeTab: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
@@ -11,6 +11,7 @@ interface NavProps {
   ) => void;
   hoveredLink: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
   mode?: "consolidate" | "split";
+  disabled?: boolean;
 }
 
 const styles = `
@@ -30,10 +31,13 @@ export const Nav = ({
   setHoveredLink,
   hoveredLink,
   mode = "consolidate",
+  disabled = false,
 }: NavProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [touchStartTime, setTouchStartTime] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousLink = useRef<
     "auto" | "manual" | "total" | "perCoin" | "custom" | null
@@ -42,6 +46,7 @@ export const Nav = ({
   const handleMouseEnter = (
     link: "auto" | "manual" | "total" | "perCoin" | "custom"
   ) => {
+    if (disabled) return;
     previousLink.current = hoveredLink;
     setHoveredLink(link);
   };
@@ -70,6 +75,37 @@ export const Nav = ({
       const x = e.pageX - scrollRef.current.offsetLeft;
       const walk = (x - startX) * 2;
       scrollRef.current.scrollLeft = scrollLeft - walk;
+    }
+  };
+
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchStartTime(Date.now());
+    setTouchStartX(e.touches[0].clientX);
+    if (scrollRef.current) {
+      setStartX(e.touches[0].clientX - scrollRef.current.offsetLeft);
+      setScrollLeft(scrollRef.current.scrollLeft);
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!scrollRef.current) return;
+    const x = e.touches[0].clientX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = (
+    e: TouchEvent,
+    tabId: "auto" | "manual" | "total" | "perCoin" | "custom"
+  ) => {
+    if (disabled) return;
+    const touchEndTime = Date.now();
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchDuration = touchEndTime - touchStartTime;
+    const touchDistance = Math.abs(touchEndX - touchStartX);
+
+    if (touchDuration < 200 && touchDistance < 10) {
+      setActiveTab(tabId);
     }
   };
 
@@ -104,6 +140,8 @@ export const Nav = ({
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
     >
       <div className="container mx-auto max-w-2xl">
         <div
@@ -153,17 +191,23 @@ export const Nav = ({
           {tabs.map((tab) => (
             <div
               key={tab.id}
-              className="relative p-2 rounded-lg transition-all duration-300 ease-in-out group flex-1 text-center"
+              className="relative p-2 rounded-lg transition-all duration-300 ease-in-out group flex-1 text-center touch-none"
               onMouseEnter={() => handleMouseEnter(tab.id)}
               onMouseLeave={handleMouseLeave}
+              onTouchEnd={(e) => handleTouchEnd(e, tab.id)}
             >
               <button
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => !disabled && setActiveTab(tab.id)}
                 className={`${
                   activeTab === tab.id
                     ? "font-medium text-lightOrange"
                     : "text-muted-foreground"
-                } group-hover:text-lightOrange relative z-10 block text-sm w-full`}
+                } ${
+                  disabled
+                    ? "opacity-50 cursor-not-allowed"
+                    : "group-hover:text-lightOrange"
+                } relative z-10 block text-sm w-full`}
+                disabled={disabled}
               >
                 {tab.label}
               </button>

@@ -288,7 +288,22 @@ async function validateToken(tokenId: string): Promise<boolean> {
   }
 }
 
+async function isNodeLocked(): Promise<boolean> {
+  const res = await MDS.cmd.status();
+
+  if (!res.status) {
+    throw new MDSError("Something went wrong", "node_locked");
+  }
+
+  if (res.response.locked) {
+    return true;
+  }
+
+  return false;
+}
+
 export {
+  isNodeLocked,
   manualConsolidation,
   validateToken,
   getBalance,

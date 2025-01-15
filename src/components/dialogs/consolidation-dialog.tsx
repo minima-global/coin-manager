@@ -106,7 +106,7 @@ export function ConsolidationDialog({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.2 }}
-          className="flex flex-col items-center justify-center pt-2"
+          className="flex flex-col items-center justify-center"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -116,11 +116,11 @@ export function ConsolidationDialog({
               stiffness: 100,
               damping: 15,
             }}
-            className="flex flex-col items-center justify-center gap-2 mt-2"
+            className="flex flex-col items-center justify-center gap-2 "
           >
             {mdsEventData?.uid === consolidationData ? (
               <>
-                {mdsEventData.accept ? (
+                {mdsEventData.accept && mdsEventData.status ? (
                   <div className="flex flex-col gap-2 items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -172,17 +172,50 @@ export function ConsolidationDialog({
                   </div>
                 )}
               </>
+            ) : typeof consolidationData !== "string" &&
+              consolidationData.status ? (
+              <div className="flex flex-col gap-2 items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="48"
+                  height="49"
+                  fill="none"
+                  viewBox="0 0 48 49"
+                >
+                  <mask
+                    id="mask0_5417_26503"
+                    width="48"
+                    height="49"
+                    x="0"
+                    y="0"
+                    maskUnits="userSpaceOnUse"
+                    style={{ maskType: "alpha" }}
+                  >
+                    <path fill="#D9D9D9" d="M0 .804h48v48H0z"></path>
+                  </mask>
+                  <g mask="url(#mask0_5417_26503)">
+                    <path
+                      fill="#4FE3C1"
+                      d="m21.05 33.23 13.477-13.476-1.742-1.712L21.05 29.796l-5.923-5.923-1.693 1.712zm2.953 10.574q-3.91 0-7.37-1.496a19.3 19.3 0 0 1-6.049-4.086 19.3 19.3 0 0 1-4.087-6.047Q5 28.72 5 24.807q0-3.942 1.496-7.41 1.496-3.47 4.085-6.034 2.59-2.565 6.047-4.063 3.457-1.496 7.369-1.496 3.942 0 7.41 1.496t6.034 4.06 4.063 6.032Q43 20.858 43 24.8q0 3.91-1.496 7.37t-4.06 6.05q-2.564 2.591-6.032 4.087-3.466 1.497-7.408 1.497M24 41.534q6.984 0 11.858-4.888 4.872-4.888 4.873-11.842 0-6.986-4.873-11.858T24 8.073q-6.954 0-11.842 4.873T7.27 24.804q0 6.954 4.888 11.842T24 41.534"
+                    ></path>
+                  </g>
+                </svg>
+
+                <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
+                  Consolidation Successful!
+                </p>
+              </div>
             ) : (
               <>
                 {typeof consolidationData === "string" &&
                   mdsEventData?.uid !== consolidationData && (
-                    <div className="flex flex-col gap-2 items-center justify-center">
-                      <div className="gif gif-dark my-4 invert dark:invert-0" />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        You must accept the consolidation in the pending app...
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-2 text-emerald-400">
-                        {consolidationData}
+                    <div className="flex flex-col gap-2 items-center justify-center mb-4">
+                      <p className="text-sm text-muted-foreground ">
+                        To complete the consolidation, go to the Pending
+                        MiniDapp and approve the command. That's it!
+                        <br />
+                        <br />
+                        Once approved, your coins will be consolidated.
                       </p>
                     </div>
                   )}
@@ -214,6 +247,9 @@ export function ConsolidationDialog({
             </DialogDescription>
           </DialogHeader>
           {consolidationContent}
+          <DialogClose asChild>
+            <Button className="w-full">Close</Button>
+          </DialogClose>
         </DialogContent>
       </Dialog>
     );
@@ -240,9 +276,9 @@ export function ConsolidationDialog({
         <DrawerFooter>
           {consolidationContent}
           <DrawerClose asChild>
-            <Button variant="outline" className="w-full">
-              Close
-            </Button>
+            <DialogClose asChild>
+              <Button className="w-full">Close</Button>
+            </DialogClose>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -285,8 +321,7 @@ export function ManualConsolidationDialog({
           />
           <DialogClose asChild>
             <Button
-              variant="outline"
-              className="w-full bg-transparent hover:bg-transparent"
+              className="w-full"
               onClick={() => {
                 onConsolidate?.();
               }}

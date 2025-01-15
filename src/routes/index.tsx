@@ -86,7 +86,7 @@ export default function TokenManager() {
     "font-bold truncate text-neutral-800 dark:text-neutral-300 max-w-[150px]";
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <h1 className="text-2xl font-bold mb-4">Tokens</h1>
 
       <div className="grid gap-4 w-full">
@@ -96,7 +96,7 @@ export default function TokenManager() {
               <Link
                 to="/tokens/$tokenId"
                 params={{ tokenId: token.tokenid }}
-                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[9999]"
+                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[50]"
               >
                 <div className="w-[48px] h-[48px] border border-darkConstrast dark:border-grey80 rounded overflow-hidden">
                   <svg
@@ -157,7 +157,7 @@ export default function TokenManager() {
               <Link
                 to="/tokens/$tokenId"
                 params={{ tokenId: token.tokenid }}
-                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[9999]"
+                className="cursor-pointer bg-grey10 dark:bg-darkContrast relative w-full flex items-center p-3 rounded z-[50]"
               >
                 <div className="aspect-square w-12 h-12 overflow-hidden">
                   <img

@@ -5,6 +5,7 @@ import {
   getCoins,
   getCoinsByTokenId,
   getTokenById,
+  isNodeLocked,
 } from "@/lib/minima/mds-functions";
 import type {
   Balance,
@@ -22,6 +23,13 @@ export function useMinima() {
   const balance = useQuery<MDSResponse<Balance[]> | null>({
     queryKey: ["balance"],
     queryFn: getBalance,
+    enabled: isInited,
+    refetchInterval: 5000, // 5 seconds
+  });
+
+  const nodeLocked = useQuery<boolean>({
+    queryKey: ["nodeLocked"],
+    queryFn: isNodeLocked,
     enabled: isInited,
     refetchInterval: 5000, // 5 seconds
   });
@@ -61,6 +69,7 @@ export function useMinima() {
   return {
     isInited,
     balance: balance.data,
+    nodeLocked,
     coins: coins.data,
     coinsByTokenId,
     tokenById,

@@ -13,11 +13,12 @@ import {
 import { Nav } from "@/components/nav";
 import { Button } from "@/components/ui/button";
 import { ConsolidationContent } from "@/components/tokens/consolidation-content";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Split } from "@/components/tokens/split";
 import { MDSResponse } from "@minima-global/mds";
 import { Coin } from "@minima-global/mds";
 import { getDisabledCoins } from "@/lib/minima/get-disabled-coins";
+import { LockedNodeDialog } from "@/components/dialogs/locked-node-dialog";
 
 type TabValue = "consolidate" | "split" | null;
 
@@ -27,9 +28,10 @@ export const Route = createFileRoute("/tokens/$tokenId")({
 
 function Tokens() {
   const { tokenId } = Route.useParams();
-  const { coinsByTokenId, balanceByTokenIdQuery } = useMinima();
+  const { coinsByTokenId, balanceByTokenIdQuery, nodeLocked } = useMinima();
   const { data: coins } = coinsByTokenId(tokenId);
   const { data: balance } = balanceByTokenIdQuery(tokenId);
+  const [showLockedDialog, setShowLockedDialog] = useState(false);
 
   const [activeTab, setActiveTab] = useQueryState<TabValue>("tab", {
     defaultValue: null,
@@ -40,13 +42,34 @@ function Tokens() {
     serialize: (value) => value || "",
   });
 
+  // Close dialog when node is unlocked
+  useEffect(() => {
+    if (!nodeLocked?.data) {
+      setShowLockedDialog(false);
+    }
+  }, [nodeLocked?.data]);
+
+  // Show dialog on page load if node is locked and a tab is selected
+  useEffect(() => {
+    if (nodeLocked?.data && activeTab !== null) {
+      setShowLockedDialog(true);
+    }
+  }, [nodeLocked?.data, activeTab]);
+
   if (!coins || !balance) return null;
 
   const disabledCoins = getDisabledCoins(balance, coins);
 
+  const handleTabChange = (tab: TabValue) => {
+    setActiveTab(tab);
+    if (nodeLocked?.data) {
+      setShowLockedDialog(true);
+    }
+  };
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div className="relative">
+    <AnimatePresence mode="sync">
+      <motion.div className="relative" key="main-container">
         {activeTab !== null ? (
           <div className="flex flex-col gap-4 mb-4">
             <Button
@@ -65,14 +88,15 @@ function Tokens() {
             isLinkEnabled={false}
             type="showcase"
             totalCoins={coins?.response.length}
-            balance={balance.response}
+            balance={balance}
+            coins={coins}
             tab={activeTab}
           />
 
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">
             {activeTab === null && (
               <motion.div
-                key="manage"
+                key="manage-section"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -86,12 +110,12 @@ function Tokens() {
                     </h1>
                     <p className="text-sm text-muted-foreground">
                       Combines multiple small coins into larger ones. This is
-                      essential for preventing “dust” - lots of tiny coins that
+                      essential for preventing "dust" - lots of tiny coins that
                       clutter your wallet.
                     </p>
                   </div>
                   <Button
-                    onClick={() => setActiveTab("consolidate")}
+                    onClick={() => handleTabChange("consolidate")}
                     variant="outline"
                     className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
                   >
@@ -110,7 +134,7 @@ function Tokens() {
                     </p>
                   </div>
                   <Button
-                    onClick={() => setActiveTab("split")}
+                    onClick={() => handleTabChange("split")}
                     variant="outline"
                     className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
                   >
@@ -160,6 +184,7 @@ function Tokens() {
           </AnimatePresence>
         </div>
       </motion.div>
+      {showLockedDialog && <LockedNodeDialog />}
     </AnimatePresence>
   );
 }
@@ -203,6 +228,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
         setActiveTab={setActiveTab}
         setHoveredLink={setHoveredLink}
         hoveredLink={hoveredLink}
+        disabled={disabled}
       />
 
       {activeTab === "auto" ? (
@@ -228,9 +254,9 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
           <ConsolidationContent disabled={disabled} />
         </>
       ) : activeTab === "manual" ? (
-        <AnimatePresence>
+        <AnimatePresence mode="sync">
           <motion.div
-            key="form"
+            key="form-section"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}

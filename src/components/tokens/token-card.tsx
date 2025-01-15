@@ -20,7 +20,8 @@ interface TokenCardProps {
   isLinkEnabled: boolean;
   type: "showcase" | "token";
   totalCoins?: number;
-  balance?: Balance[];
+  balance: MDSResponse<BalanceWithTokenDetails[]>;
+  coins: MDSResponse<Coin[]>;
   tab?: string;
 }
 
@@ -31,6 +32,7 @@ export function TokenCard({
   totalCoins,
   balance,
   tab,
+  coins,
 }: TokenCardProps) {
   const handleCopyToken = async () => {
     await navigator.clipboard.writeText(JSON.stringify(token, null, 2));
@@ -46,6 +48,7 @@ export function TokenCard({
           totalCoins={totalCoins}
           balance={balance}
           tab={tab}
+          coins={coins}
           onCopy={handleCopyToken}
         />
       ))}
@@ -63,7 +66,8 @@ interface TokenCardItemProps {
   token: Balance;
   type: "showcase" | "token";
   totalCoins?: number;
-  balance?: Balance[];
+  balance: MDSResponse<BalanceWithTokenDetails[]>;
+  coins: MDSResponse<Coin[]>;
   tab?: string;
   onCopy: () => Promise<void>;
 }
@@ -73,6 +77,7 @@ function TokenCardItem({
   type,
   totalCoins,
   balance,
+  coins,
   tab,
   onCopy,
 }: TokenCardItemProps) {
@@ -103,6 +108,7 @@ function TokenCardItem({
             balance={balance}
             totalCoins={totalCoins}
             tab={tab}
+            coins={coins}
           />
         )}
       </div>

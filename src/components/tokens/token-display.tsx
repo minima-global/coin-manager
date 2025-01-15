@@ -1,13 +1,20 @@
 import { cn } from "@/lib/utils";
-import { Balance } from "@minima-global/mds";
+import {
+  Balance,
+  MDSResponse,
+  Coin,
+  BalanceWithTokenDetails,
+} from "@minima-global/mds";
 import { motion, AnimatePresence } from "framer-motion";
 import { CopyButton } from "@/components/copy-button";
+import { getDisabledCoins } from "@/lib/minima/get-disabled-coins";
 
 interface TokenDisplayProps {
   token: Balance;
-  balance?: Balance[];
+  balance: MDSResponse<BalanceWithTokenDetails[]>;
   totalCoins?: number;
   tab?: string;
+  coins: MDSResponse<Coin[]>;
 }
 
 export function TokenDisplay({
@@ -15,8 +22,11 @@ export function TokenDisplay({
   balance,
   totalCoins,
   tab,
+  coins,
 }: TokenDisplayProps) {
-  const isUnconfirmedBalance = balance?.[0].unconfirmed !== "0";
+  const isUnconfirmedBalance = balance.response[0].unconfirmed !== "0";
+
+  const disabledCoins = getDisabledCoins(balance, coins);
 
   const copyTokenId = async () => {
     await navigator.clipboard.writeText(token.tokenid);
@@ -101,6 +111,22 @@ export function TokenDisplay({
                 <div className="w-full h-[1px] bg-border" />
               </>
             )}
+
+            {disabledCoins.size > 0 && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  <span
+                    className={cn(
+                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
+                    )}
+                  >
+                    Locked Coins:
+                  </span>
+                  {disabledCoins.size}
+                </p>
+                <div className="w-full h-[1px] bg-border" />
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -137,7 +163,7 @@ function BalanceDisplay({ label, value, isUnconfirmed }: BalanceDisplayProps) {
   return (
     <p
       className={cn(
-        "text-sm",
+        "text-sm truncate",
         isUnconfirmed
           ? "text-yellow-600 animate-pulse font-bold"
           : "text-muted-foreground"

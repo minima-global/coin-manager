@@ -151,7 +151,9 @@ function Tokens() {
                 className="w-full"
               >
                 <SplitCoins
-                  disabled={disabledCoins.has(coins.response[0].coinid)}
+                  disabled={coins.response.every((coin) =>
+                    disabledCoins.has(coin.coinid)
+                  )}
                 />
               </motion.div>
             )}
@@ -210,17 +212,19 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
             <p className="text-sm text-muted-foreground">
               Consolidate your coins automatically
             </p>
-            {disabled && (
+
+            {disabled &&
+            coins.response.every((coin) => disabledCoins.has(coin.coinid)) ? (
               <span className="text-xs text-rose-500">
                 You have no sendable coins
               </span>
-            )}
-            {coins.response.length < 3 && !disabled && (
+            ) : coins.response.length < 3 ? (
               <span className="text-xs text-muted-foreground -mt-1">
                 (Must have at least 3 coins)
               </span>
-            )}
+            ) : null}
           </div>
+
           <ConsolidationContent disabled={disabled} />
         </>
       ) : activeTab === "manual" ? (
@@ -238,16 +242,16 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
                 Select coins to consolidate
               </p>
 
-              {disabled && (
+              {disabled &&
+              coins.response.every((coin) => disabledCoins.has(coin.coinid)) ? (
                 <span className="text-xs text-rose-500">
                   You have no sendable coins
                 </span>
-              )}
-              {!disabled && (
+              ) : coins.response.length < 3 ? (
                 <span className="text-xs text-muted-foreground -mt-1">
                   (Must have at least 3 coins)
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="flex flex-col gap-2">
               {coins?.response.map((coin) => (

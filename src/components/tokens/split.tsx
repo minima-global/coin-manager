@@ -9,7 +9,6 @@ import { splitCoins } from "@/lib/minima/mds-functions";
 import { splitFormSchema, SplitFormValues } from "@/lib/schemas";
 import { toast } from "sonner";
 import { MDSError } from "@/lib/error";
-
 import { Nav } from "@/components/nav";
 import { SplitDialog } from "../dialogs/split-dialog";
 import { MDSResponse } from "@minima-global/mds";
@@ -65,7 +64,14 @@ export function Split({ disabled }: { disabled: boolean }) {
   };
 
   const handleSplitTypeChange = (
-    newType: "auto" | "manual" | "total" | "perCoin" | "custom"
+    newType:
+      | "auto"
+      | "manual"
+      | "total"
+      | "perCoin"
+      | "custom"
+      | "track"
+      | "untrack"
   ) => {
     if (newType === "total" || newType === "perCoin" || newType === "custom") {
       setSplitType(newType);
@@ -83,7 +89,15 @@ export function Split({ disabled }: { disabled: boolean }) {
   };
 
   const handleHoveredLinkChange = (
-    link: "auto" | "manual" | "total" | "perCoin" | "custom" | null
+    link:
+      | "auto"
+      | "manual"
+      | "total"
+      | "perCoin"
+      | "custom"
+      | "track"
+      | "untrack"
+      | null
   ) => {
     if (
       link === null ||

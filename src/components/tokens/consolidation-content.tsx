@@ -23,6 +23,7 @@ import { appContext } from "@/AppContext";
 import { ConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
 import { CopyButton } from "../copy-button";
 import type { MDSResponse, Transaction } from "@minima-global/mds";
+import { cn } from "@/lib/utils";
 
 interface ConsolidationContentProps {
   disabled: boolean;
@@ -106,6 +107,7 @@ export function ConsolidationContent({ disabled }: ConsolidationContentProps) {
             <Button
               type="button"
               variant="ghost"
+              disabled={disabled}
               size={"sm"}
               className="p-0 w-fit hover:bg-transparent text-muted-foreground text-sm"
               onClick={() => setIsOptionsOpen(!isOptionsOpen)}
@@ -120,7 +122,13 @@ export function ConsolidationContent({ disabled }: ConsolidationContentProps) {
             </Button>
           </div>
 
-          <div className="flex gap-2">
+          <div
+            className={cn(
+              "flex gap-2",
+              disabled && "opacity-50",
+              isOptionsOpen ? "hidden" : ""
+            )}
+          >
             <div className="p-3 dark:bg-darkContrast bg-grey10 flex-1 overflow-x-auto rounded">
               <div className="flex items-center justify-between gap-4">
                 <code className="text-sm text-muted-foreground whitespace-nowrap">

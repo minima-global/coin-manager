@@ -7,26 +7,23 @@ import {
 } from "@minima-global/mds";
 import { motion, AnimatePresence } from "framer-motion";
 import { CopyButton } from "@/components/copy-button";
-import { getDisabledCoins } from "@/lib/minima/get-disabled-coins";
 
 interface TokenDisplayProps {
   token: Balance;
   balance: MDSResponse<BalanceWithTokenDetails[]>;
-  totalCoins?: number;
   tab?: string;
   coins: MDSResponse<Coin[]>;
+  sendableCoins: MDSResponse<Coin[]>;
 }
 
 export function TokenDisplay({
   token,
   balance,
-  totalCoins,
   tab,
   coins,
+  sendableCoins,
 }: TokenDisplayProps) {
   const isUnconfirmedBalance = balance.response[0].unconfirmed !== "0";
-
-  const disabledCoins = getDisabledCoins(balance, coins);
 
   const copyTokenId = async () => {
     await navigator.clipboard.writeText(token.tokenid);
@@ -82,7 +79,7 @@ export function TokenDisplay({
               </>
             )}
 
-            {totalCoins && totalCoins > 0 ? (
+            {balance.response[0].coins ? (
               <>
                 <p className="text-sm text-muted-foreground">
                   <span
@@ -92,27 +89,13 @@ export function TokenDisplay({
                   >
                     Total Coins:
                   </span>
-                  {totalCoins}
+                  {balance.response[0].coins}
                 </p>
                 <div className="w-full h-[1px] bg-border" />
               </>
-            ) : (
-              <>
-                <p className="text-sm text-muted-foreground">
-                  <span
-                    className={cn(
-                      "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
-                    )}
-                  >
-                    Total Coins:
-                  </span>
-                  No coins found
-                </p>
-                <div className="w-full h-[1px] bg-border" />
-              </>
-            )}
+            ) : null}
 
-            {disabledCoins.size > 0 && (
+            {coins?.response.length - sendableCoins?.response.length > 0 && (
               <>
                 <p className="text-sm text-muted-foreground">
                   <span
@@ -122,7 +105,7 @@ export function TokenDisplay({
                   >
                     Locked Coins:
                   </span>
-                  {disabledCoins.size}
+                  {coins?.response.length - sendableCoins?.response.length}
                 </p>
                 <div className="w-full h-[1px] bg-border" />
               </>
@@ -136,7 +119,9 @@ export function TokenDisplay({
         value={token.sendable}
         isUnconfirmed={isUnconfirmedBalance}
       />
+
       <div className="w-full h-[1px] bg-border" />
+
       <BalanceDisplay
         label="Confirmed"
         value={token.confirmed}

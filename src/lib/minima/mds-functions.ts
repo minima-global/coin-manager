@@ -25,10 +25,41 @@ async function getCoinsByTokenId(
   tokenId: string
 ): Promise<MDSResponse<Coin[]>> {
   const coins = await MDS.cmd.coins({
-    params: { tokenid: tokenId },
+    params: { tokenid: tokenId, relevant: "true" },
   });
 
   return coins;
+}
+
+async function getTrackableCoins(): Promise<MDSResponse<Coin[]>> {
+  const coins = await MDS.cmd.coins();
+  return coins;
+}
+
+async function getSendableCoinsByTokenId(
+  tokenId: string
+): Promise<MDSResponse<Coin[]>> {
+  const coins = await MDS.cmd.coins({
+    params: { tokenid: tokenId, relevant: "true", sendable: "true" },
+  });
+
+  return coins;
+}
+
+async function untrackCoin(
+  coinId: string,
+  track: "true" | "false"
+): Promise<MDSResponse<string>> {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const coin = await MDS.cmd.cointrack({
+    params: { coinid: coinId, enable: track },
+  });
+
+  if (!coin.pending && coin.error) {
+    throw new MDSError("Error untracking coin", "untrack_error");
+  }
+
+  return coin;
 }
 
 async function getTokenById(tokenId: string): Promise<MDSResponse<Token>> {
@@ -310,9 +341,12 @@ export {
   getCoins,
   getCoinsByTokenId,
   getTokenById,
+  getTrackableCoins,
   checkConsolidation,
   consolidateCoins,
   balanceByTokenId,
   splitCoins,
+  getSendableCoinsByTokenId,
   getAddress,
+  untrackCoin,
 };

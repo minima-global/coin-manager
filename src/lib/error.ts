@@ -3,7 +3,8 @@ export type MDSErrorTags =
   | "txpow_to_big"
   | "split_error"
   | "too_many_outputs"
-  | "node_locked";
+  | "node_locked"
+  | "untrack_error";
 export const DEFAULT_ERROR_TAG = "server_error";
 
 type DefaultErrorTag = typeof DEFAULT_ERROR_TAG;

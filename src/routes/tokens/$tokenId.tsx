@@ -5,6 +5,7 @@ import { useMinima } from "@/hooks/use-minima";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeftIcon } from "lucide-react";
+import { Virtuoso } from "react-virtuoso";
 import {
   ActionBarCloseTrigger,
   ActionBarContent,
@@ -17,10 +18,9 @@ import { useState, useEffect } from "react";
 import { Split } from "@/components/tokens/split";
 import { MDSResponse } from "@minima-global/mds";
 import { Coin } from "@minima-global/mds";
-import { getDisabledCoins } from "@/lib/minima/get-disabled-coins";
 import { LockedNodeDialog } from "@/components/dialogs/locked-node-dialog";
 
-type TabValue = "consolidate" | "split" | null;
+type TabValue = "consolidate" | "split" | "untrack" | "track" | null;
 
 export const Route = createFileRoute("/tokens/$tokenId")({
   component: Tokens,
@@ -28,15 +28,27 @@ export const Route = createFileRoute("/tokens/$tokenId")({
 
 function Tokens() {
   const { tokenId } = Route.useParams();
-  const { coinsByTokenId, balanceByTokenIdQuery, nodeLocked } = useMinima();
+  const {
+    coinsByTokenId,
+    balanceByTokenIdQuery,
+    nodeLocked,
+    sendableCoinsByTokenIdQuery,
+  } = useMinima();
   const { data: coins } = coinsByTokenId(tokenId);
   const { data: balance } = balanceByTokenIdQuery(tokenId);
+  const { data: sendableCoins } = sendableCoinsByTokenIdQuery(tokenId);
   const [showLockedDialog, setShowLockedDialog] = useState(false);
 
   const [activeTab, setActiveTab] = useQueryState<TabValue>("tab", {
     defaultValue: null,
     parse: (value) => {
-      if (value === "consolidate" || value === "split") return value;
+      if (
+        value === "consolidate" ||
+        value === "split" ||
+        value === "untrack" ||
+        value === "track"
+      )
+        return value;
       return null;
     },
     serialize: (value) => value || "",
@@ -56,9 +68,7 @@ function Tokens() {
     }
   }, [nodeLocked?.data, activeTab]);
 
-  if (!coins || !balance) return null;
-
-  const disabledCoins = getDisabledCoins(balance, coins);
+  if (!coins || !balance || !sendableCoins) return null;
 
   const handleTabChange = (tab: TabValue) => {
     setActiveTab(tab);
@@ -87,9 +97,9 @@ function Tokens() {
             token={balance}
             isLinkEnabled={false}
             type="showcase"
-            totalCoins={coins?.response.length}
             balance={balance}
             coins={coins}
+            sendableCoins={sendableCoins}
             tab={activeTab}
           />
 
@@ -156,10 +166,8 @@ function Tokens() {
                 <div className="w-full">
                   <ConsolidateCoins
                     coins={coins}
-                    disabled={
-                      disabledCoins.has(coins.response[0].coinid) ||
-                      coins.response.length < 3
-                    }
+                    disabled={sendableCoins.response.length < 3}
+                    sendableCoins={sendableCoins}
                   />
                 </div>
               </motion.div>
@@ -174,11 +182,7 @@ function Tokens() {
                 transition={{ duration: 0.2 }}
                 className="w-full"
               >
-                <SplitCoins
-                  disabled={coins.response.every((coin) =>
-                    disabledCoins.has(coin.coinid)
-                  )}
-                />
+                <SplitCoins disabled={sendableCoins.response.length === 0} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -191,23 +195,36 @@ function Tokens() {
 
 interface ConsolidateProps {
   coins: MDSResponse<Coin[]>;
+  sendableCoins: MDSResponse<Coin[]>;
   disabled: boolean;
 }
 
-const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
+const ConsolidateCoins = ({
+  coins,
+  disabled,
+  sendableCoins,
+}: ConsolidateProps) => {
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<
-    "auto" | "manual" | "total" | "perCoin" | "custom" | null
+    | "auto"
+    | "manual"
+    | "total"
+    | "perCoin"
+    | "custom"
+    | "untrack"
+    | "track"
+    | null
   >("auto");
   const [hoveredLink, setHoveredLink] = useState<
-    "auto" | "manual" | "total" | "perCoin" | "custom" | null
+    | "auto"
+    | "manual"
+    | "total"
+    | "perCoin"
+    | "custom"
+    | "untrack"
+    | "track"
+    | null
   >(null);
-
-  const { tokenId } = Route.useParams();
-  const { balanceByTokenIdQuery } = useMinima();
-  const { data: balance } = balanceByTokenIdQuery(tokenId);
-
-  const disabledCoins = getDisabledCoins(balance, coins);
 
   const handleTokenSelect = (coinId: string) => {
     setSelectedTokens((prev) =>
@@ -222,7 +239,7 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
   };
 
   return (
-    <div className="container mx-auto  max-w-2xl flex flex-col gap-4 pb-20">
+    <div className="container mx-auto max-w-2xl flex flex-col gap-4 pb-20">
       <Nav
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -233,20 +250,19 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
 
       {activeTab === "auto" ? (
         <>
-          <div className="flex flex-col gap-1 ">
+          <div className="flex flex-col gap-1">
             <h1 className="text-base">Auto Consolidation</h1>
             <p className="text-sm text-muted-foreground">
               Consolidate your coins automatically
             </p>
 
-            {disabled &&
-            coins.response.every((coin) => disabledCoins.has(coin.coinid)) ? (
+            {sendableCoins.response.length > 0 && coins.response.length < 3 ? (
+              <span className="text-xs text-rose-500">
+                You need at least 3 coins to consolidate
+              </span>
+            ) : sendableCoins.response.length === 0 ? (
               <span className="text-xs text-rose-500">
                 You have no sendable coins
-              </span>
-            ) : coins.response.length < 3 ? (
-              <span className="text-xs text-muted-foreground -mt-1">
-                (Must have at least 3 coins)
               </span>
             ) : null}
           </div>
@@ -267,29 +283,27 @@ const ConsolidateCoins = ({ coins, disabled }: ConsolidateProps) => {
               <p className="text-sm text-muted-foreground">
                 Select coins to consolidate
               </p>
-
-              {disabled &&
-              coins.response.every((coin) => disabledCoins.has(coin.coinid)) ? (
-                <span className="text-xs text-rose-500">
-                  You have no sendable coins
-                </span>
-              ) : coins.response.length < 3 ? (
-                <span className="text-xs text-muted-foreground -mt-1">
-                  (Must have at least 3 coins)
-                </span>
-              ) : null}
             </div>
-            <div className="flex flex-col gap-2">
-              {coins?.response.map((coin) => (
-                <CoinCard
-                  key={coin.coinid}
-                  coin={coin}
-                  isSelected={selectedTokens.includes(coin.coinid)}
-                  onSelect={handleTokenSelect}
-                  disabled={disabled}
-                  isDisabled={disabledCoins.has(coin.coinid) || disabled}
-                />
-              ))}
+            <div style={{ height: "600px" }}>
+              <Virtuoso
+                className="custom-scrollbar"
+                style={{
+                  height: "100%",
+                }}
+                data={sendableCoins.response}
+                itemContent={(_, coin) => (
+                  <div className="mb-2">
+                    <CoinCard
+                      key={coin.coinid}
+                      coin={coin}
+                      isSelected={selectedTokens.includes(coin.coinid)}
+                      onSelect={handleTokenSelect}
+                      disabled={disabled}
+                      isDisabled={sendableCoins.response.length < 3}
+                    />
+                  </div>
+                )}
+              />
             </div>
             <ActionBarRoot
               open={selectedTokens.length > 0}

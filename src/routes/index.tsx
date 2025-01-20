@@ -16,6 +16,12 @@ export const Route = createFileRoute("/")({
     if (!localStorage.getItem("hasSeenSplash")) {
       return redirect({ to: "/info" });
     }
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("tab") || url.searchParams.has("search")) {
+      url.searchParams.delete("tab");
+      url.searchParams.delete("search");
+      window.history.replaceState({}, "", url.toString());
+    }
   },
 });
 
@@ -125,7 +131,19 @@ export default function TokenManager() {
 
                   <p className={tokenAmountStyle}>{token.confirmed}</p>
                 </div>
+
                 <div className="flex items-center justify-end flex-1">
+                  <div className="flex items-center justify-end flex-1">
+                    {Number(token.confirmed) - Number(token.sendable) > 0 && (
+                      <LockIcon className="text-[#91919D] mr-2" size={16} />
+                    )}
+
+                    {Number(token.confirmed) - Number(token.sendable) > 0 && (
+                      <p className="text-[#91919D] text-xs">
+                        {Number(token.confirmed) - Number(token.sendable)}
+                      </p>
+                    )}
+                  </div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"

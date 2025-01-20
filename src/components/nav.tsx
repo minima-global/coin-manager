@@ -2,15 +2,46 @@ import { motion } from "framer-motion";
 import { useRef, useState, MouseEvent, TouchEvent } from "react";
 
 interface NavProps {
-  activeTab: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
+  activeTab:
+    | "auto"
+    | "manual"
+    | "total"
+    | "perCoin"
+    | "custom"
+    | "untrack"
+    | "track"
+    | null;
   setActiveTab: (
-    tab: "auto" | "manual" | "total" | "perCoin" | "custom"
+    tab:
+      | "auto"
+      | "manual"
+      | "total"
+      | "perCoin"
+      | "custom"
+      | "untrack"
+      | "track"
   ) => void;
   setHoveredLink: (
-    link: "auto" | "manual" | "total" | "perCoin" | "custom" | null
+    link:
+      | "auto"
+      | "manual"
+      | "total"
+      | "perCoin"
+      | "custom"
+      | "untrack"
+      | "track"
+      | null
   ) => void;
-  hoveredLink: "auto" | "manual" | "total" | "perCoin" | "custom" | null;
-  mode?: "consolidate" | "split";
+  hoveredLink:
+    | "auto"
+    | "manual"
+    | "total"
+    | "perCoin"
+    | "custom"
+    | "untrack"
+    | "track"
+    | null;
+  mode?: "consolidate" | "split" | "untrack";
   disabled?: boolean;
 }
 
@@ -40,11 +71,25 @@ export const Nav = ({
   const [touchStartX, setTouchStartX] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousLink = useRef<
-    "auto" | "manual" | "total" | "perCoin" | "custom" | null
+    | "auto"
+    | "manual"
+    | "total"
+    | "perCoin"
+    | "custom"
+    | "untrack"
+    | "track"
+    | null
   >(null);
 
   const handleMouseEnter = (
-    link: "auto" | "manual" | "total" | "perCoin" | "custom"
+    link:
+      | "auto"
+      | "manual"
+      | "total"
+      | "perCoin"
+      | "custom"
+      | "untrack"
+      | "track"
   ) => {
     if (disabled) return;
     previousLink.current = hoveredLink;
@@ -115,11 +160,16 @@ export const Nav = ({
           { id: "auto" as const, label: "Auto" },
           { id: "manual" as const, label: "Manual" },
         ]
-      : [
-          { id: "total" as const, label: "Split Total Amount" },
-          { id: "perCoin" as const, label: "Split by Amount" },
-          { id: "custom" as const, label: "Custom Split" },
-        ];
+      : mode === "untrack"
+        ? [
+            { id: "untrack" as const, label: "UnTrack" },
+            { id: "track" as const, label: "Track" },
+          ]
+        : [
+            { id: "total" as const, label: "Split Total Amount" },
+            { id: "perCoin" as const, label: "Split by Amount" },
+            { id: "custom" as const, label: "Custom Split" },
+          ];
 
   const getOffset = (index: number) => {
     if (mode === "split") {

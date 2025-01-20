@@ -4,7 +4,9 @@ import {
   getBalance,
   getCoins,
   getCoinsByTokenId,
+  getSendableCoinsByTokenId,
   getTokenById,
+  getTrackableCoins,
   isNodeLocked,
 } from "@/lib/minima/mds-functions";
 import type {
@@ -48,6 +50,20 @@ export function useMinima() {
     });
   };
 
+  const sendableCoinsByTokenIdQuery = (tokenId: string) => {
+    return useQuery<MDSResponse<Coin[]> | null>({
+      queryKey: ["sendableCoinsByTokenId", tokenId],
+      queryFn: () => getSendableCoinsByTokenId(tokenId),
+      enabled: isInited,
+    });
+  };
+
+  const trackableCoins = useQuery<MDSResponse<Coin[]> | null>({
+    queryKey: ["trackableCoins"],
+    queryFn: getTrackableCoins,
+    enabled: isInited,
+  });
+
   const tokenById = (tokenId: string) => {
     return useQuery<MDSResponse<Token> | null>({
       queryKey: ["token", tokenId],
@@ -72,7 +88,9 @@ export function useMinima() {
     nodeLocked,
     coins: coins.data,
     coinsByTokenId,
+    sendableCoinsByTokenIdQuery,
     tokenById,
     balanceByTokenIdQuery,
+    trackableCoins,
   };
 }

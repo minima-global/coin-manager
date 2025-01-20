@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 import {
   Drawer,
@@ -15,16 +15,16 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 
-import { Hint } from "../hint"
-import { InfoIcon } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Coin } from "@minima-global/mds"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import { Button } from "../ui/button"
+import { Hint } from "../hint";
+import { InfoIcon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Coin } from "@minima-global/mds";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { Button } from "../ui/button";
 export function CoinInfoDialog({ coin }: { coin: Coin }) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
     return (
@@ -102,7 +102,7 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
           </AnimatePresence>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -179,5 +179,5 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

@@ -41,7 +41,9 @@ export function LockedNodeDialog() {
                 Please unlock your node and return to this page to continue.
               </DialogDescription>
             </DialogHeader>
-            <Button onClick={() => navigate({ to: "/" })}>Return Home</Button>
+            <Button className="w-full" onClick={() => navigate({ to: "/" })}>
+              Home
+            </Button>
           </DialogContent>
         </DialogPortal>
       </Dialog>
@@ -62,7 +64,7 @@ export function LockedNodeDialog() {
               Please unlock your node to access this page
             </DrawerDescription>
           </DrawerHeader>
-          <Button onClick={() => navigate({ to: "/" })}>Return Home</Button>
+          <Button onClick={() => navigate({ to: "/" })}> Home</Button>
         </DrawerContent>
       </DrawerPortal>
     </Drawer>

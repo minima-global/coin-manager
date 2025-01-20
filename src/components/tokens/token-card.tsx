@@ -9,30 +9,33 @@ import { CopyButton } from "../copy-button";
 import { Checkbox } from "../ui/checkbox";
 import { CoinInfoDialog } from "../dialogs/coin-info";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   fetchIPFSImageUri,
   makeTokenImage,
 } from "@/lib/minima/make-token-image";
+import { CircleMinus, Check } from "lucide-react";
+import { Hint } from "../hint";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TokenCardProps {
   token: MDSResponse<BalanceWithTokenDetails[]>;
   isLinkEnabled: boolean;
   type: "showcase" | "token";
-  totalCoins?: number;
   balance: MDSResponse<BalanceWithTokenDetails[]>;
   coins: MDSResponse<Coin[]>;
   tab?: string;
+  sendableCoins: MDSResponse<Coin[]>;
 }
 
 export function TokenCard({
   token,
   isLinkEnabled,
   type,
-  totalCoins,
   balance,
   tab,
   coins,
+  sendableCoins,
 }: TokenCardProps) {
   const handleCopyToken = async () => {
     await navigator.clipboard.writeText(JSON.stringify(token, null, 2));
@@ -45,11 +48,11 @@ export function TokenCard({
           key={token.tokenid}
           token={token}
           type={type}
-          totalCoins={totalCoins}
           balance={balance}
           tab={tab}
           coins={coins}
           onCopy={handleCopyToken}
+          sendableCoins={sendableCoins}
         />
       ))}
     </>
@@ -70,16 +73,18 @@ interface TokenCardItemProps {
   coins: MDSResponse<Coin[]>;
   tab?: string;
   onCopy: () => Promise<void>;
+  sendableCoins: MDSResponse<Coin[]>;
 }
 
 function TokenCardItem({
   token,
   type,
-  totalCoins,
+
   balance,
   coins,
   tab,
   onCopy,
+  sendableCoins,
 }: TokenCardItemProps) {
   const isMinima = token.tokenid === "0x00";
   const tokenName =
@@ -106,9 +111,9 @@ function TokenCardItem({
           <TokenDisplay
             token={token}
             balance={balance}
-            totalCoins={totalCoins}
             tab={tab}
             coins={coins}
+            sendableCoins={sendableCoins}
           />
         )}
       </div>
@@ -189,6 +194,8 @@ interface CoinCardProps {
   onSelect: (id: string) => void;
   disabled?: boolean;
   isDisabled?: boolean;
+  mode?: "untrack";
+  onUntrack?: (coinId: string) => void;
 }
 
 export const CoinCard = ({
@@ -196,7 +203,53 @@ export const CoinCard = ({
   isSelected,
   onSelect,
   isDisabled,
+  mode,
+  onUntrack,
 }: CoinCardProps) => {
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+
+  const handleUntrackClick = useCallback(() => {
+    if (!isConfirming) {
+      setIsConfirming(true);
+      const timeout = setTimeout(() => {
+        setIsConfirming(false);
+      }, 3000);
+      setTimeoutId(timeout);
+    } else {
+      if (onUntrack) {
+        onUntrack(coin.coinid);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // Show green confirmation state
+      setIsConfirmed(true);
+
+      // After 3 seconds, start the exit sequence
+      const confirmTimeout = setTimeout(() => {
+        setIsConfirming(false); // This triggers the slide animation
+
+        // After the slide animation, remove the green background
+        setTimeout(() => {
+          setIsConfirmed(false);
+        }, 200); // Match the slide animation duration
+      }, 3000);
+
+      setTimeoutId(confirmTimeout);
+    }
+  }, [isConfirming, coin.coinid, onUntrack, timeoutId]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
+
   return (
     <>
       <div
@@ -205,41 +258,114 @@ export const CoinCard = ({
           isDisabled ? "opacity-50" : ""
         )}
       >
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center space-x-4">
-            <Checkbox
-              disabled={isDisabled}
-              id={`token-${coin.coinid}`}
-              checked={isSelected}
-              onCheckedChange={() => {
-                onSelect(coin.coinid);
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            />
-          </div>
-          <p className="text-xs truncate text-muted-foreground ml-2">
-            <span
-              className={cn(
-                "font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb]"
-              )}
-            >
-              Coin ID:
-            </span>
-            {coin.coinid}
-          </p>
-          <div className="flex items-center gap-2">
-            <p className="font-medium text-xs tr">
-              {coin.tokenamount
-                ? Number(coin.tokenamount).toFixed(2)
-                : coin.amount.includes(".")
-                  ? coin.amount.split(".")[0] +
-                    "." +
-                    coin.amount.split(".")[1].slice(0, 2)
-                  : coin.amount}
+        <div className="flex items-center gap-4 p-4 w-full">
+          {mode !== "untrack" && (
+            <div className="flex-shrink-0">
+              <Checkbox
+                disabled={isDisabled}
+                id={`token-${coin.coinid}`}
+                checked={isSelected}
+                onCheckedChange={() => {
+                  onSelect(coin.coinid);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-xs truncate text-muted-foreground flex items-center">
+              <span className="font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb] inline-block w-[70px] text-center flex-shrink-0">
+                Coin ID:
+              </span>
+              <span className="truncate">{coin.coinid}</span>
             </p>
-            <CoinInfoDialog coin={coin} />
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 w-[90px]">
+            <AnimatePresence mode="wait">
+              {!isConfirming && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="font-medium text-xs truncate text-right flex-1"
+                >
+                  {coin.tokenamount
+                    ? Number(coin.tokenamount).toFixed(2)
+                    : coin.amount.includes(".")
+                      ? coin.amount.split(".")[0] +
+                        "." +
+                        coin.amount.split(".")[1].slice(0, 2)
+                      : coin.amount}
+                </motion.p>
+              )}
+            </AnimatePresence>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {mode === "untrack" && (
+                <div className="relative">
+                  <Hint label={isConfirming ? "Confirm untrack" : "Untrack"}>
+                    <button
+                      onClick={handleUntrackClick}
+                      className={cn(
+                        "relative h-6 flex items-center justify-center px-2 overflow-hidden transition-colors duration-200",
+                        isConfirming && isConfirmed
+                          ? "bg-emerald-100 dark:bg-emerald-900/30 rounded min-w-[72px]"
+                          : "min-w-[28px]"
+                      )}
+                    >
+                      <AnimatePresence mode="wait" initial={false}>
+                        {isConfirming ? (
+                          <motion.div
+                            key="confirm"
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="flex items-center gap-1"
+                          >
+                            <Check
+                              className={cn(
+                                "w-3 h-3",
+                                isConfirmed
+                                  ? "text-emerald-500"
+                                  : "text-muted-foreground"
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                "text-xs font-medium",
+                                isConfirmed
+                                  ? "text-emerald-500"
+                                  : "text-muted-foreground"
+                              )}
+                            >
+                              Confirm
+                            </span>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="untrack"
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 20, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                          >
+                            <CircleMinus className="w-4 h-4 text-muted-foreground" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  </Hint>
+                </div>
+              )}
+              {!isConfirming && (
+                <div className="flex-shrink-0 mt-1">
+                  <CoinInfoDialog coin={coin} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

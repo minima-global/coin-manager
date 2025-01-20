@@ -4,7 +4,7 @@ import { Virtuoso } from "react-virtuoso";
 import { useMinima } from "@/hooks/use-minima";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CircleCheck, Info, SearchIcon } from "lucide-react";
+import { CircleCheck, Info, SearchIcon, AlertTriangle } from "lucide-react";
 import { untrackCoin } from "@/lib/minima/mds-functions";
 import { SearchCoinsDialog } from "../dialogs/search-coins-dialog";
 import { CoinCard } from "../tokens/token-card";
@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { Hint } from "../hint";
 import { Input } from "../ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, AlertDescription } from "../ui/alert";
 
 export const TrackCoins = () => {
   const [activeTab, setActiveTab] = useState<
@@ -60,20 +61,29 @@ export const TrackCoins = () => {
 
   const { mutate } = useMutation({
     mutationFn: (coinId: string) => untrackCoin(coinId, "false"),
-    onSuccess: (data) => {
+    onMutate: () => {
+      return toast.loading("Untracking coin...", {
+        duration: Infinity,
+        description: "This may take a few seconds",
+        className: "text-black dark:text-white",
+      });
+    },
+    onSuccess: (data, _, toastId) => {
       if (data && data.pending) {
+        toast.dismiss(toastId);
         toast.success("Coin untracked", {
           icon: <CircleCheck className="w-4 h-4" />,
           description: "The command is pending",
         });
       } else {
+        toast.dismiss(toastId);
         toast.success("Coin untracked", {
           icon: <CircleCheck className="w-4 h-4" />,
         });
       }
-      //TODO: handle not pending and success
     },
-    onError: () => {
+    onError: (_, __, toastId) => {
+      toast.dismiss(toastId);
       toast.error("Failed to untrack coin");
     },
   });
@@ -114,6 +124,16 @@ export const TrackCoins = () => {
             </Button>
           </div>
 
+          <TrackCoin variant="untrack" />
+
+          <Alert variant="warning" className="mb-4">
+            <AlertTriangle className="h-5 w-5 mt-0.5" />
+            <AlertDescription>
+              Untracking coins via address in read mode can cause many pending
+              requests. To avoid this, please put your dapp in write mode.
+            </AlertDescription>
+          </Alert>
+
           <div style={{ height: "600px" }}>
             <Virtuoso
               className="custom-scrollbar"
@@ -148,43 +168,62 @@ export const TrackCoins = () => {
           />
         </>
       ) : activeTab === "track" ? (
-        <TrackCoin />
+        <TrackCoin variant="track" />
       ) : null}
     </div>
   );
 };
 
-const TrackCoin = () => {
+const TrackCoin = ({ variant }: { variant: "track" | "untrack" }) => {
   const form = useForm<TrackCoinFormValues>({
     resolver: zodResolver(trackCoinFormSchema),
     defaultValues: {
-      coinId: "",
+      value: "",
+      variant: variant,
     },
   });
 
   const { mutate } = useMutation({
-    mutationFn: (coinId: string) => untrackCoin(coinId, "true"),
-    onSuccess: (data) => {
+    mutationFn: (coinId: string) =>
+      untrackCoin(coinId, variant === "track" ? "true" : "false"),
+    onMutate: () => {
+      return toast.loading(
+        variant === "track" ? "Tracking coin..." : "Untracking coin(s)...",
+        {
+          duration: Infinity,
+          description: "This may take a few seconds",
+          className: "text-black dark:text-white",
+        }
+      );
+    },
+    onSuccess: (data, _, toastId) => {
+      toast.dismiss(toastId);
       if (data && data.pending) {
-        toast.success("Coin tracked", {
-          icon: <CircleCheck className="w-4 h-4" />,
-          description: "The command is pending",
-        });
+        toast.success(
+          variant === "track" ? "Coin tracked" : "Coin(s) untracked",
+          {
+            icon: <CircleCheck className="w-4 h-4" />,
+            description: "The command is pending",
+          }
+        );
       } else {
-        toast.success("Coin tracked", {
-          icon: <CircleCheck className="w-4 h-4" />,
-        });
+        toast.success(
+          variant === "track" ? "Coin tracked" : "Coin(s) untracked",
+          {
+            icon: <CircleCheck className="w-4 h-4" />,
+          }
+        );
       }
       form.reset();
     },
-    onError: () => {
-      toast.error("Failed to track coin");
+    onError: (_, __, toastId) => {
+      toast.dismiss(toastId);
+      toast.error("Failed to untrack coin(s)");
     },
   });
 
   const onSubmit = (values: TrackCoinFormValues) => {
-    console.log(values);
-    mutate(values.coinId);
+    mutate(values.value);
   };
 
   return (
@@ -196,24 +235,32 @@ const TrackCoin = () => {
       >
         <FormField
           control={form.control}
-          name="coinId"
+          name="value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Coin ID</FormLabel>
+              <FormLabel>
+                {variant === "track" ? "Coin ID" : "Coin ID or Address"}
+              </FormLabel>
               <FormControl>
                 <div className=" relative flex items-center">
                   <Input
                     type="text"
                     inputMode="text"
                     className="dark:bg-darkContrast bg-grey10"
-                    placeholder="0xABC.."
+                    placeholder={
+                      variant === "track" ? "0xABC.." : "0xABC.. or Mx09.."
+                    }
                     {...field}
                   />
                   <div className=" absolute right-2">
                     <Hint
                       side="left"
                       align="center"
-                      label="Enter the coin ID to track."
+                      label={
+                        variant === "track"
+                          ? "Enter the coin ID to track."
+                          : "Enter the coin ID or address to track."
+                      }
                     >
                       <Info className="h-4 w-4" />
                     </Hint>
@@ -230,7 +277,7 @@ const TrackCoin = () => {
           form="track-coin-form"
           className="w-full bg-lightOrange hover:bg-lighterOrange transition-all duration-300 text-black"
         >
-          Track Coin
+          {variant === "track" ? "Track Coin" : "Untrack Coin(s)"}
         </Button>
       </form>
     </Form>

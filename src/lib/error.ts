@@ -4,7 +4,9 @@ export type MDSErrorTags =
   | "split_error"
   | "too_many_outputs"
   | "node_locked"
-  | "untrack_error";
+  | "untrack_error"
+  | "coin_not_found";
+
 export const DEFAULT_ERROR_TAG = "server_error";
 
 type DefaultErrorTag = typeof DEFAULT_ERROR_TAG;

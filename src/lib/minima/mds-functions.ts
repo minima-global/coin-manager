@@ -31,6 +31,37 @@ async function getCoinsByTokenId(
   return coins;
 }
 
+async function getAddresses(): Promise<
+  Record<string, MDSResponse<Coin[]> | null>
+> {
+  const res = await MDS.cmd.scripts();
+  const addressCoins: Record<string, MDSResponse<Coin[]> | null> = {};
+
+  if (res.status) {
+    const allSimpleAddresses = res.response
+      .filter((s) => s.simple && s.default)
+      .map((s) => s.miniaddress);
+
+    for (const addr of allSimpleAddresses) {
+      const coins = await MDS.cmd.coins({
+        params: {
+          address: addr,
+          relevant: "true",
+          sendable: "true",
+        },
+      });
+
+      if (coins.response && coins.response.length > 0) {
+        addressCoins[addr] = coins;
+      } else {
+        addressCoins[addr] = null;
+      }
+    }
+  }
+
+  return addressCoins;
+}
+
 async function getTrackableCoins(): Promise<MDSResponse<Coin[]>> {
   const coins = await MDS.cmd.coins();
   return coins;
@@ -40,26 +71,51 @@ async function getSendableCoinsByTokenId(
   tokenId: string
 ): Promise<MDSResponse<Coin[]>> {
   const coins = await MDS.cmd.coins({
-    params: { tokenid: tokenId, relevant: "true", sendable: "true" },
+    params: {
+      tokenid: tokenId,
+      relevant: "true",
+      sendable: "true",
+    },
   });
 
   return coins;
 }
 
 async function untrackCoin(
-  coinId: string,
+  value: string,
   track: "true" | "false"
-): Promise<MDSResponse<string>> {
+): Promise<MDSResponse<string> | null> {
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  const coin = await MDS.cmd.cointrack({
-    params: { coinid: coinId, enable: track },
-  });
 
-  if (!coin.pending && coin.error) {
-    throw new MDSError("Error untracking coin", "untrack_error");
+  if (value.startsWith("0x")) {
+    const coin = await MDS.cmd.cointrack({
+      params: { coinid: value, enable: track },
+    });
+
+    if (!coin.pending && coin.error) {
+      throw new MDSError("Error untracking coin", "untrack_error");
+    }
+  } else {
+    const coins = await MDS.cmd.coins({ params: { address: value } });
+
+    if (coins.response.length === 0) {
+      throw new MDSError("Coin not found", "coin_not_found");
+    }
+
+    const coinsByAddress = coins.response.filter(
+      (coin) => coin.miniaddress === value
+    );
+
+    for (const c of coinsByAddress) {
+      await MDS.cmd.cointrack({
+        params: { coinid: c.coinid, enable: track },
+      });
+
+      console.log("UNTRACKED", c.coinid);
+    }
   }
-
-  return coin;
+  console.log("DONE");
+  return null;
 }
 
 async function getTokenById(tokenId: string): Promise<MDSResponse<Token>> {
@@ -338,6 +394,7 @@ export {
   manualConsolidation,
   validateToken,
   getBalance,
+  getAddresses,
   getCoins,
   getCoinsByTokenId,
   getTokenById,

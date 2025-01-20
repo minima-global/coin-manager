@@ -2,7 +2,7 @@ import { useQueryState } from "nuqs";
 import { ManualConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
 import { CoinCard, TokenCard } from "@/components/tokens/token-card";
 import { useMinima } from "@/hooks/use-minima";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeftIcon } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/tokens/$tokenId")({
 });
 
 function Tokens() {
+  const matches = useMatches();
   const { tokenId } = Route.useParams();
   const {
     coinsByTokenId,
@@ -68,6 +69,12 @@ function Tokens() {
     }
   }, [nodeLocked?.data, activeTab]);
 
+  // If we're on the info route, only render the Outlet
+  const isInfoRoute = matches.some((match) => match.pathname.endsWith("/info"));
+  if (isInfoRoute) {
+    return <Outlet />;
+  }
+
   if (!coins || !balance || !sendableCoins) return null;
 
   const handleTabChange = (tab: TabValue) => {
@@ -78,118 +85,121 @@ function Tokens() {
   };
 
   return (
-    <AnimatePresence mode="sync">
-      <motion.div className="relative" key="main-container">
-        {activeTab !== null ? (
-          <div className="flex flex-col gap-4 mb-4">
-            <Button
-              onClick={() => setActiveTab(null)}
-              variant="ghost"
-              className="p-0 w-fit hover:bg-transparent"
-            >
-              <ArrowLeftIcon className="w-4 h-4" /> Back
-            </Button>
+    <>
+      <AnimatePresence mode="sync">
+        <motion.div className="relative" key="main-container">
+          {activeTab !== null ? (
+            <div className="flex flex-col gap-4 mb-4">
+              <Button
+                onClick={() => setActiveTab(null)}
+                variant="ghost"
+                className="p-0 w-fit hover:bg-transparent"
+              >
+                <ArrowLeftIcon className="w-4 h-4" /> Back
+              </Button>
+            </div>
+          ) : null}
+
+          <div className="container mx-auto max-w-2xl flex flex-col gap-4">
+            <TokenCard
+              token={balance}
+              isLinkEnabled={false}
+              type="showcase"
+              balance={balance}
+              coins={coins}
+              sendableCoins={sendableCoins}
+              tab={activeTab}
+            />
+
+            <AnimatePresence mode="sync">
+              {activeTab === null && (
+                <motion.div
+                  key="manage-section"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex flex-col mt-5 gap-4"
+                >
+                  <h1 className="text-base">Manage</h1>
+                  <div className="flex flex-col md:flex-row py-8 px-6 bg-grey10 dark:bg-darkContrast md:items-center justify-center gap-10 mt-2">
+                    <div className="flex flex-col gap-2">
+                      <h1 className="text-[22px] font-medium">
+                        Consolidate your coins
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        Combines multiple small coins into larger ones. This is
+                        essential for preventing "dust" - lots of tiny coins
+                        that clutter your wallet.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => handleTabChange("consolidate")}
+                      variant="outline"
+                      className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
+                    >
+                      Consolidate
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row py-8 px-6 bg-grey10 dark:bg-darkContrast md:items-center justify-center gap-10 mt-2">
+                    <div className="flex flex-col gap-2">
+                      <h1 className="text-[22px] font-medium">
+                        Split your coins
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        Break down larger coins into smaller amounts. This
+                        ensures you have multiple coins available for
+                        transactions
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => handleTabChange("split")}
+                      variant="outline"
+                      className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
+                    >
+                      Split
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "consolidate" && (
+                <motion.div
+                  key="consolidate"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full"
+                >
+                  <div className="w-full">
+                    <ConsolidateCoins
+                      coins={coins}
+                      disabled={sendableCoins.response.length < 3}
+                      sendableCoins={sendableCoins}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "split" && (
+                <motion.div
+                  key="split"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full"
+                >
+                  <SplitCoins disabled={sendableCoins.response.length === 0} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        ) : null}
-
-        <div className="container mx-auto max-w-2xl flex flex-col gap-4">
-          <TokenCard
-            token={balance}
-            isLinkEnabled={false}
-            type="showcase"
-            balance={balance}
-            coins={coins}
-            sendableCoins={sendableCoins}
-            tab={activeTab}
-          />
-
-          <AnimatePresence mode="sync">
-            {activeTab === null && (
-              <motion.div
-                key="manage-section"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col mt-5 gap-4"
-              >
-                <h1 className="text-base">Manage</h1>
-                <div className="flex flex-col md:flex-row py-8 px-6 bg-grey10 dark:bg-darkContrast md:items-center justify-center gap-10 mt-2">
-                  <div className="flex flex-col gap-2">
-                    <h1 className="text-[22px] font-medium">
-                      Consolidate your coins
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                      Combines multiple small coins into larger ones. This is
-                      essential for preventing "dust" - lots of tiny coins that
-                      clutter your wallet.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => handleTabChange("consolidate")}
-                    variant="outline"
-                    className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
-                  >
-                    Consolidate
-                  </Button>
-                </div>
-
-                <div className="flex flex-col md:flex-row py-8 px-6 bg-grey10 dark:bg-darkContrast md:items-center justify-center gap-10 mt-2">
-                  <div className="flex flex-col gap-2">
-                    <h1 className="text-[22px] font-medium">
-                      Split your coins
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                      Break down larger coins into smaller amounts. This ensures
-                      you have multiple coins available for transactions
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => handleTabChange("split")}
-                    variant="outline"
-                    className="bg-lightOrange text-black p-0 px-8 py-4  hover:bg-lighterOrange transition-all duration-300 ease-in-out hover:text-black min-w-[156px]"
-                  >
-                    Split
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "consolidate" && (
-              <motion.div
-                key="consolidate"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className="w-full"
-              >
-                <div className="w-full">
-                  <ConsolidateCoins
-                    coins={coins}
-                    disabled={sendableCoins.response.length < 3}
-                    sendableCoins={sendableCoins}
-                  />
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "split" && (
-              <motion.div
-                key="split"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className="w-full"
-              >
-                <SplitCoins disabled={sendableCoins.response.length === 0} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+        </motion.div>
+      </AnimatePresence>
       {showLockedDialog && <LockedNodeDialog />}
-    </AnimatePresence>
+    </>
   );
 }
 

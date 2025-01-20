@@ -14,9 +14,11 @@ import {
   fetchIPFSImageUri,
   makeTokenImage,
 } from "@/lib/minima/make-token-image";
-import { CircleMinus, Check } from "lucide-react";
+import { CircleMinus, Check, Info } from "lucide-react";
 import { Hint } from "../hint";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "../ui/button";
+import { Link } from "@tanstack/react-router";
 
 interface TokenCardProps {
   token: MDSResponse<BalanceWithTokenDetails[]>;
@@ -102,6 +104,16 @@ function TokenCardItem({
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          <Link to={`/tokens/${token.tokenid}/info`}>
+            <Button
+              variant="outline"
+              className={cn(
+                "h-auto px-5 transition-all duration-300 dark:bg-mediumDarkContrast bg-grey10 hover:bg-grey10"
+              )}
+            >
+              <Info className="w-4 h-4" />
+            </Button>
+          </Link>
           <CopyButton onCopy={onCopy} />
         </div>
       </div>
@@ -274,15 +286,17 @@ export const CoinCard = ({
               />
             </div>
           )}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 max-w-[60%]">
             <p className="text-xs truncate text-muted-foreground flex items-center">
-              <span className="font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb] inline-block w-[70px] text-center flex-shrink-0">
-                Coin ID:
+              <span className="font-medium text-primary py-[2px] px-2 mr-1 dark:bg-[#18181b] bg-[#ebebeb] inline-block w-[40px] text-center flex-shrink-0">
+                ID:
               </span>
-              <span className="truncate">{coin.coinid}</span>
+              <span className="truncate" title={coin.coinid}>
+                {coin.coinid}
+              </span>
             </p>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0 w-[90px]">
+          <div className="flex items-center gap-2 flex-shrink-0 min-w-[140px] justify-end">
             <AnimatePresence mode="wait">
               {!isConfirming && (
                 <motion.p
@@ -290,15 +304,17 @@ export const CoinCard = ({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="font-medium text-xs truncate text-right flex-1"
+                  className="font-medium text-xs whitespace-nowrap text-right flex-1"
                 >
-                  {coin.tokenamount
-                    ? Number(coin.tokenamount).toFixed(2)
-                    : coin.amount.includes(".")
-                      ? coin.amount.split(".")[0] +
-                        "." +
-                        coin.amount.split(".")[1].slice(0, 2)
-                      : coin.amount}
+                  {coin.tokenamount !== undefined
+                    ? Number(coin.tokenamount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : Number(coin.amount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </motion.p>
               )}
             </AnimatePresence>

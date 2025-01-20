@@ -36,7 +36,7 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
             </Hint>
           </button>
         </DialogTrigger>
-        <DialogContent className="dark:bg-darkContrast bg-grey10">
+        <DialogContent className="dark:bg-darkContrast bg-grey10 max-w-2xl">
           <DialogHeader>
             <DialogTitle>Coin Info</DialogTitle>
           </DialogHeader>
@@ -49,13 +49,13 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
               transition={{ duration: 0.2, ease: "easeInOut" }}
               style={{ overflow: "hidden" }}
             >
-              <div className=" pb-4 pt-2">
-                <div className="space-y-2 text-sm">
+              <div className="pb-4 pt-2">
+                <div className="space-y-1.5 text-xs">
                   <div className="flex items-center">
                     <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                       Coin ID:
                     </span>
-                    <span className="font-mono truncate min-w-0">
+                    <span className="font-mono min-w-0 flex-1">
                       {coin.coinid}
                     </span>
                   </div>
@@ -64,7 +64,7 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
                       <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                         Address:
                       </span>
-                      <span className="font-mono truncate min-w-0">
+                      <span className="font-mono min-w-0 flex-1">
                         {coin.miniaddress}
                       </span>
                     </div>
@@ -74,27 +74,26 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
                       <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                         Token ID:
                       </span>
-                      <span className="font-mono truncate min-w-0">
+                      <span className="font-mono min-w-0 flex-1">
                         {coin.tokenid}
                       </span>
                     </div>
                   )}
-                  {coin.tokenamount && (
+                  {coin.amount && (
                     <div className="flex items-center">
                       <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                         Amount:
                       </span>
-                      <span className="font-mono truncate min-w-0">
-                        {coin.tokenamount}
+                      <span className="font-mono min-w-0 flex-1">
+                        {coin.amount}
                       </span>
                     </div>
                   )}
-
                   <div className="flex items-center">
                     <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                       Created:
                     </span>
-                    <span>Block {coin.created}</span>
+                    <span className="flex-1">Block {coin.created}</span>
                   </div>
                 </div>
               </div>
@@ -116,9 +115,9 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
       </DrawerTrigger>
       <DrawerContent className="dark:bg-darkContrast bg-grey10">
         <DrawerHeader>
-          <DrawerTitle>Consolidate</DrawerTitle>
+          <DrawerTitle>Coin Info</DrawerTitle>
           <DrawerDescription>
-            Consolidate your coins automatically
+            View detailed information about this coin
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter>
@@ -130,41 +129,51 @@ export function CoinInfoDialog({ coin }: { coin: Coin }) {
               transition={{ duration: 0.2, ease: "easeInOut" }}
               style={{ overflow: "hidden" }}
             >
-              <div className=" pb-4 pt-2">
-                <div className="space-y-2 text-sm">
+              <div className="pb-4 pt-2">
+                <div className="space-y-1.5 text-xs">
                   <div className="flex items-center">
-                    <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0">
+                    <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                       Coin ID:
                     </span>
-                    <span className="font-mono truncate min-w-0">
+                    <span className="font-mono min-w-0 flex-1">
                       {coin.coinid}
                     </span>
                   </div>
                   {coin.address && (
                     <div className="flex items-center">
-                      <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0">
+                      <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                         Address:
                       </span>
-                      <span className="font-mono truncate min-w-0">
+                      <span className="font-mono min-w-0 flex-1">
                         {coin.miniaddress}
                       </span>
                     </div>
                   )}
                   {coin.tokenid && (
                     <div className="flex items-center">
-                      <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0">
+                      <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                         Token ID:
                       </span>
-                      <span className="font-mono truncate min-w-0">
+                      <span className="font-mono min-w-0 flex-1">
                         {coin.tokenid}
                       </span>
                     </div>
                   )}
+                  {coin.tokenamount && (
+                    <div className="flex items-center">
+                      <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
+                        Amount:
+                      </span>
+                      <span className="font-mono min-w-0 flex-1">
+                        {coin.tokenamount}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center">
-                    <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0">
+                    <span className="font-medium bg-grey40 dark:bg-lightDarkContrast text-primary py-[2px] px-2 mr-1 shrink-0 w-20">
                       Created:
                     </span>
-                    <span>Block {coin.created}</span>
+                    <span className="flex-1">Block {coin.created}</span>
                   </div>
                 </div>
               </div>

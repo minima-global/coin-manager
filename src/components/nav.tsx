@@ -162,7 +162,7 @@ export const Nav = ({
         ]
       : mode === "untrack"
         ? [
-            { id: "untrack" as const, label: "UnTrack" },
+            { id: "untrack" as const, label: "Untrack" },
             { id: "track" as const, label: "Track" },
           ]
         : [

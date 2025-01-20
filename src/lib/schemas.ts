@@ -74,7 +74,8 @@ export const manualConsolidationFormSchema = z.object({
 });
 
 export const trackCoinFormSchema = z.object({
-  coinId: z.string(),
+  value: z.string(),
+  variant: z.enum(["track", "untrack"]),
 });
 
 export type TrackCoinFormValues = z.infer<typeof trackCoinFormSchema>;

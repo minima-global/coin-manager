@@ -16,6 +16,7 @@ import { Route as TokensIndexImport } from './routes/tokens/index'
 import { Route as InfoIndexImport } from './routes/info/index'
 import { Route as CointrackIndexImport } from './routes/cointrack/index'
 import { Route as TokensTokenIdImport } from './routes/tokens/$tokenId'
+import { Route as TokensTokenIdInfoImport } from './routes/tokens/$tokenId.info'
 
 // Create/Update Routes
 
@@ -47,6 +48,12 @@ const TokensTokenIdRoute = TokensTokenIdImport.update({
   id: '/tokens/$tokenId',
   path: '/tokens/$tokenId',
   getParentRoute: () => rootRoute,
+} as any)
+
+const TokensTokenIdInfoRoute = TokensTokenIdInfoImport.update({
+  id: '/info',
+  path: '/info',
+  getParentRoute: () => TokensTokenIdRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -88,41 +95,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TokensIndexImport
       parentRoute: typeof rootRoute
     }
+    '/tokens/$tokenId/info': {
+      id: '/tokens/$tokenId/info'
+      path: '/info'
+      fullPath: '/tokens/$tokenId/info'
+      preLoaderRoute: typeof TokensTokenIdInfoImport
+      parentRoute: typeof TokensTokenIdImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface TokensTokenIdRouteChildren {
+  TokensTokenIdInfoRoute: typeof TokensTokenIdInfoRoute
+}
+
+const TokensTokenIdRouteChildren: TokensTokenIdRouteChildren = {
+  TokensTokenIdInfoRoute: TokensTokenIdInfoRoute,
+}
+
+const TokensTokenIdRouteWithChildren = TokensTokenIdRoute._addFileChildren(
+  TokensTokenIdRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/tokens/$tokenId': typeof TokensTokenIdRoute
+  '/tokens/$tokenId': typeof TokensTokenIdRouteWithChildren
   '/cointrack': typeof CointrackIndexRoute
   '/info': typeof InfoIndexRoute
   '/tokens': typeof TokensIndexRoute
+  '/tokens/$tokenId/info': typeof TokensTokenIdInfoRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/tokens/$tokenId': typeof TokensTokenIdRoute
+  '/tokens/$tokenId': typeof TokensTokenIdRouteWithChildren
   '/cointrack': typeof CointrackIndexRoute
   '/info': typeof InfoIndexRoute
   '/tokens': typeof TokensIndexRoute
+  '/tokens/$tokenId/info': typeof TokensTokenIdInfoRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/tokens/$tokenId': typeof TokensTokenIdRoute
+  '/tokens/$tokenId': typeof TokensTokenIdRouteWithChildren
   '/cointrack/': typeof CointrackIndexRoute
   '/info/': typeof InfoIndexRoute
   '/tokens/': typeof TokensIndexRoute
+  '/tokens/$tokenId/info': typeof TokensTokenIdInfoRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tokens/$tokenId' | '/cointrack' | '/info' | '/tokens'
+  fullPaths:
+    | '/'
+    | '/tokens/$tokenId'
+    | '/cointrack'
+    | '/info'
+    | '/tokens'
+    | '/tokens/$tokenId/info'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tokens/$tokenId' | '/cointrack' | '/info' | '/tokens'
+  to:
+    | '/'
+    | '/tokens/$tokenId'
+    | '/cointrack'
+    | '/info'
+    | '/tokens'
+    | '/tokens/$tokenId/info'
   id:
     | '__root__'
     | '/'
@@ -130,12 +171,13 @@ export interface FileRouteTypes {
     | '/cointrack/'
     | '/info/'
     | '/tokens/'
+    | '/tokens/$tokenId/info'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TokensTokenIdRoute: typeof TokensTokenIdRoute
+  TokensTokenIdRoute: typeof TokensTokenIdRouteWithChildren
   CointrackIndexRoute: typeof CointrackIndexRoute
   InfoIndexRoute: typeof InfoIndexRoute
   TokensIndexRoute: typeof TokensIndexRoute
@@ -143,7 +185,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TokensTokenIdRoute: TokensTokenIdRoute,
+  TokensTokenIdRoute: TokensTokenIdRouteWithChildren,
   CointrackIndexRoute: CointrackIndexRoute,
   InfoIndexRoute: InfoIndexRoute,
   TokensIndexRoute: TokensIndexRoute,
@@ -172,7 +214,10 @@ export const routeTree = rootRoute
       "filePath": "index.tsx"
     },
     "/tokens/$tokenId": {
-      "filePath": "tokens/$tokenId.tsx"
+      "filePath": "tokens/$tokenId.tsx",
+      "children": [
+        "/tokens/$tokenId/info"
+      ]
     },
     "/cointrack/": {
       "filePath": "cointrack/index.tsx"
@@ -182,6 +227,10 @@ export const routeTree = rootRoute
     },
     "/tokens/": {
       "filePath": "tokens/index.tsx"
+    },
+    "/tokens/$tokenId/info": {
+      "filePath": "tokens/$tokenId.info.tsx",
+      "parent": "/tokens/$tokenId"
     }
   }
 }

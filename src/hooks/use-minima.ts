@@ -1,6 +1,7 @@
 import { appContext } from "@/AppContext";
 import {
   balanceByTokenId,
+  getAddresses,
   getBalance,
   getCoins,
   getCoinsByTokenId,
@@ -39,6 +40,12 @@ export function useMinima() {
   const coins = useQuery<MDSResponse<Coin[]> | null>({
     queryKey: ["coins"],
     queryFn: getCoins,
+    enabled: isInited,
+  });
+
+  const addresses = useQuery<Record<string, MDSResponse<Coin[]> | null>>({
+    queryKey: ["addresses"],
+    queryFn: getAddresses,
     enabled: isInited,
   });
 
@@ -86,6 +93,7 @@ export function useMinima() {
     isInited,
     balance: balance.data,
     nodeLocked,
+    addresses,
     coins: coins.data,
     coinsByTokenId,
     sendableCoinsByTokenIdQuery,

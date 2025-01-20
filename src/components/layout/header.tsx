@@ -63,9 +63,7 @@ const Header = () => {
                   <Link to="/">
                     <HomeIcon />
                   </Link>
-                  <Link to="/cointrack">
-                    <TrackIcon />
-                  </Link>
+              
                   <Link to="/info">
                     <InfoIcon />
                   </Link>

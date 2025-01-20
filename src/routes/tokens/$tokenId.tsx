@@ -2,7 +2,7 @@ import { useQueryState } from "nuqs";
 import { ManualConsolidationDialog } from "@/components/dialogs/consolidation-dialog";
 import { CoinCard, TokenCard } from "@/components/tokens/token-card";
 import { useMinima } from "@/hooks/use-minima";
-import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeftIcon } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/tokens/$tokenId")({
 });
 
 function Tokens() {
-  const matches = useMatches();
+
   const { tokenId } = Route.useParams();
   const {
     coinsByTokenId,
@@ -69,11 +69,7 @@ function Tokens() {
     }
   }, [nodeLocked?.data, activeTab]);
 
-  // If we're on the info route, only render the Outlet
-  const isInfoRoute = matches.some((match) => match.pathname.endsWith("/info"));
-  if (isInfoRoute) {
-    return <Outlet />;
-  }
+
 
   if (!coins || !balance || !sendableCoins) return null;
 

@@ -43,11 +43,13 @@ export function useMinima() {
     enabled: isInited,
   });
 
-  const addresses = useQuery<Record<string, MDSResponse<Coin[]> | null>>({
-    queryKey: ["addresses"],
-    queryFn: getAddresses,
-    enabled: isInited,
-  });
+  const addresses = (tokenId: string, showLockedCoins: boolean = false) => {
+    return useQuery<Record<string, MDSResponse<Coin[]> | null>>({
+      queryKey: ["addresses", tokenId, showLockedCoins],
+      queryFn: () => getAddresses(tokenId, showLockedCoins),
+      enabled: isInited,
+    });
+  };
 
   const coinsByTokenId = (tokenId: string) => {
     return useQuery<MDSResponse<Coin[]> | null>({

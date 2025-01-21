@@ -31,32 +31,88 @@ async function getCoinsByTokenId(
   return coins;
 }
 
-async function getAddresses(): Promise<
-  Record<string, MDSResponse<Coin[]> | null>
-> {
-  const res = await MDS.cmd.scripts();
+async function getAddresses(
+  tokenId: string = "0x00",
+  showAllCoins: boolean = false
+): Promise<Record<string, MDSResponse<Coin[]> | null>> {
   const addressCoins: Record<string, MDSResponse<Coin[]> | null> = {};
+  const res = await MDS.cmd.scripts();
+  
+  if (!res.status) {
+    return addressCoins;
+  }
 
-  if (res.status) {
-    const allSimpleAddresses = res.response
-      .filter((s) => s.simple && s.default)
-      .map((s) => s.miniaddress);
+  const allSimpleAddresses = res.response
+    .filter((s) => s.simple && s.default)
+    .map((s) => s.miniaddress);
+
+  if (!showAllCoins) {
+    // Get only spendable coins
+    const coins = await MDS.cmd.coins({
+      params: {
+        tokenid: tokenId,
+        relevant: "true",
+        sendable: "true",
+      },
+    });
+
+    if (!coins.status) {
+      return addressCoins;
+    }
 
     for (const addr of allSimpleAddresses) {
-      const coins = await MDS.cmd.coins({
-        params: {
-          address: addr,
-          relevant: "true",
-          sendable: "true",
-        },
-      });
-
-      if (coins.response && coins.response.length > 0) {
-        addressCoins[addr] = coins;
+      const addressMatches = coins.response.filter(
+        (coin) => coin.miniaddress === addr
+      );
+      
+      if (addressMatches.length > 0) {
+        addressCoins[addr] = {
+          ...coins,
+          status: true,
+          response: addressMatches,
+          pending: false
+        };
       } else {
         addressCoins[addr] = null;
       }
     }
+  } else {
+    // Get all coins
+    const coins = await MDS.cmd.coins({
+      params: {
+        tokenid: tokenId,
+        relevant: "true",
+      },
+    });
+
+    if (!coins.status) {
+      return addressCoins;
+    }
+
+    // First, initialize all simple addresses with null
+    for (const addr of allSimpleAddresses) {
+      addressCoins[addr] = null;
+    }
+
+    // Group coins by miniaddress
+    const addressGroups = coins.response.reduce((groups, coin) => {
+      const addr = coin.miniaddress;
+      if (!groups[addr]) {
+        groups[addr] = [];
+      }
+      groups[addr].push(coin);
+      return groups;
+    }, {} as Record<string, Coin[]>);
+
+    // Convert groups to MDSResponse format, this will include both simple addresses and any additional addresses
+    Object.entries(addressGroups).forEach(([addr, addrCoins]) => {
+      addressCoins[addr] = {
+        ...coins,
+        status: true,
+        response: addrCoins,
+        pending: false
+      };
+    });
   }
 
   return addressCoins;

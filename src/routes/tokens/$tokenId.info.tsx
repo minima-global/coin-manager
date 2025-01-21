@@ -3,7 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { CoinCard } from "@/components/tokens/token-card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Coins, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/tokens/$tokenId/info")({
   component: Info,
@@ -13,16 +16,19 @@ function Info() {
   const { tokenId } = Route.useParams();
   const { addresses } = useMinima();
   const [expandedAddress, setExpandedAddress] = useState<string | null>(null);
+  const [showAllCoins, setShowAllCoins] = useState(false);
+  const addressesQuery = addresses(tokenId, showAllCoins);
 
   // Sort addresses so ones with coins appear first
   const sortedAddresses = useMemo(() => {
-    if (!addresses.data) return [];
+    if (!addressesQuery.data) return [];
 
-    return Object.entries(addresses.data)
+    return Object.entries(addressesQuery.data)
       .map(([addr, addrCoins]) => {
         const addressCoinsForToken = addrCoins?.response.filter(
           (coin) => coin.tokenid === tokenId
         );
+        
         const totalAmount =
           addressCoinsForToken?.reduce(
             (sum, coin) => sum + Number(coin.tokenamount || coin.amount),
@@ -49,7 +55,7 @@ function Info() {
         }
         return 0;
       });
-  }, [addresses.data, tokenId]);
+  }, [addressesQuery.data, tokenId]);
 
   const addressesWithCoins = sortedAddresses.filter((addr) => addr.hasCoins);
   const totalTokenAmount = addressesWithCoins.reduce(
@@ -59,12 +65,35 @@ function Info() {
 
   return (
     <div className="p-4 md:p-3">
-      <h1 className="text-2xl md:text-xl font-bold mb-4 md:mb-2">Token Info</h1>
+      <h1 className="text-2xl md:text-xl font-bold mb-4">Token Info</h1>
 
-      <p className="text-sm md:text-xs text-muted-foreground mb-4 md:mb-2">
-        View all addresses with coins for {tokenId} and their total amount with
-        details for each coin.
-      </p>
+      <div className="flex flex-col space-y-4 md:space-y-2 mb-6">
+        <p className="text-sm md:text-xs text-muted-foreground">
+          View and manage coins for token {tokenId}. Toggle between all coins and spendable coins.
+        </p>
+        
+        <div className="flex items-center justify-start space-x-4 bg-grey10 dark:bg-darkContrast rounded-lg p-3">
+          <Switch
+            id="show-all-coins"
+            checked={showAllCoins}
+            onCheckedChange={setShowAllCoins}
+            className="data-[state=checked]:bg-primary"
+          />
+          <Label htmlFor="show-all-coins" className="text-sm flex items-center gap-2">
+            {showAllCoins ? (
+              <>
+                <Coins className="h-4 w-4" />
+                <span>Showing All Coins</span>
+              </>
+            ) : (
+              <>
+                <Wallet className="h-4 w-4" />
+                <span>Showing Spendable Coins</span>
+              </>
+            )}
+          </Label>
+        </div>
+      </div>
 
       {/* Overview Section */}
       <div className="mb-6 md:mb-4">

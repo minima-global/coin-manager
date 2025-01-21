@@ -3,7 +3,6 @@ import ModeToggle from "../mode-toggle";
 import { appContext } from "@/AppContext";
 import { Link } from "@tanstack/react-router";
 import useAndroidShowTitleBar from "@/hooks/android-title-bar";
-import { RadarIcon } from "lucide-react";
 
 const Header = () => {
   const { topBlock } = useContext(appContext);
@@ -63,7 +62,7 @@ const Header = () => {
                   <Link to="/">
                     <HomeIcon />
                   </Link>
-              
+
                   <Link to="/info">
                     <InfoIcon />
                   </Link>
@@ -112,20 +111,6 @@ const HomeIcon = () => {
               ></path>
             </g>
           </svg>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TrackIcon = () => {
-  return (
-    <div className={`gap-3 lg:gap-4 flex items-center text-sm transition-all`}>
-      <div className="hidden iphone:block">
-        <div
-          className={`relative flex h-[32px] w-[32px] lg:h-[44px] lg:w-[44px] scale-100 items-center justify-center rounded-full border border-grey80 bg-white from-[#17191C] to-[#37393F] transition-all duration-75 hover:bg-grey10 active:scale-75 dark:border-mediumDarkContrast dark:bg-darkContrast dark:hover:bg-transparent dark:hover:bg-gradient-to-t`}
-        >
-          <RadarIcon className="w-6 h-6 text-black dark:text-white" />
         </div>
       </div>
     </div>

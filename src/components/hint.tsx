@@ -26,6 +26,7 @@ export interface HintProps {
   sideOffset?: number;
   alignOffset?: number;
   open?: boolean;
+  disableDrawer?: boolean;
 }
 
 export const Hint = ({
@@ -36,6 +37,7 @@ export const Hint = ({
   sideOffset,
   alignOffset,
   open,
+  disableDrawer,
 }: HintProps) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -59,6 +61,10 @@ export const Hint = ({
         </Tooltip>
       </TooltipProvider>
     );
+  }
+
+  if (disableDrawer) {
+    return children;
   }
 
   return (

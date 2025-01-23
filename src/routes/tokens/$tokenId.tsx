@@ -27,7 +27,6 @@ export const Route = createFileRoute("/tokens/$tokenId")({
 });
 
 function Tokens() {
-
   const { tokenId } = Route.useParams();
   const {
     coinsByTokenId,
@@ -68,8 +67,6 @@ function Tokens() {
       setShowLockedDialog(true);
     }
   }, [nodeLocked?.data, activeTab]);
-
-
 
   if (!coins || !balance || !sendableCoins) return null;
 
@@ -205,32 +202,23 @@ interface ConsolidateProps {
   disabled: boolean;
 }
 
+type Tab =
+  | "auto"
+  | "manual"
+  | "total"
+  | "perCoin"
+  | "custom"
+  | "untrack"
+  | "track";
+
 const ConsolidateCoins = ({
   coins,
   disabled,
   sendableCoins,
 }: ConsolidateProps) => {
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<
-    | "auto"
-    | "manual"
-    | "total"
-    | "perCoin"
-    | "custom"
-    | "untrack"
-    | "track"
-    | null
-  >("auto");
-  const [hoveredLink, setHoveredLink] = useState<
-    | "auto"
-    | "manual"
-    | "total"
-    | "perCoin"
-    | "custom"
-    | "untrack"
-    | "track"
-    | null
-  >(null);
+  const [activeTab, setActiveTab] = useState<Tab>("auto");
+  const [hoveredLink, setHoveredLink] = useState<Tab | null>(null);
 
   const handleTokenSelect = (coinId: string) => {
     setSelectedTokens((prev) =>

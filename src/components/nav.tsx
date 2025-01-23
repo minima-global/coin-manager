@@ -1,46 +1,20 @@
 import { motion } from "framer-motion";
 import { useRef, useState, MouseEvent, TouchEvent } from "react";
 
+type Tab =
+  | "auto"
+  | "manual"
+  | "total"
+  | "perCoin"
+  | "custom"
+  | "untrack"
+  | "track";
+
 interface NavProps {
-  activeTab:
-    | "auto"
-    | "manual"
-    | "total"
-    | "perCoin"
-    | "custom"
-    | "untrack"
-    | "track"
-    | null;
-  setActiveTab: (
-    tab:
-      | "auto"
-      | "manual"
-      | "total"
-      | "perCoin"
-      | "custom"
-      | "untrack"
-      | "track"
-  ) => void;
-  setHoveredLink: (
-    link:
-      | "auto"
-      | "manual"
-      | "total"
-      | "perCoin"
-      | "custom"
-      | "untrack"
-      | "track"
-      | null
-  ) => void;
-  hoveredLink:
-    | "auto"
-    | "manual"
-    | "total"
-    | "perCoin"
-    | "custom"
-    | "untrack"
-    | "track"
-    | null;
+  activeTab: Tab | null;
+  setActiveTab: (tab: Tab) => void;
+  setHoveredLink: (link: Tab | null) => void;
+  hoveredLink: Tab | null;
   mode?: "consolidate" | "split" | "untrack";
   disabled?: boolean;
 }
@@ -70,27 +44,9 @@ export const Nav = ({
   const [touchStartTime, setTouchStartTime] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const previousLink = useRef<
-    | "auto"
-    | "manual"
-    | "total"
-    | "perCoin"
-    | "custom"
-    | "untrack"
-    | "track"
-    | null
-  >(null);
+  const previousLink = useRef<Tab | null>(null);
 
-  const handleMouseEnter = (
-    link:
-      | "auto"
-      | "manual"
-      | "total"
-      | "perCoin"
-      | "custom"
-      | "untrack"
-      | "track"
-  ) => {
+  const handleMouseEnter = (link: Tab) => {
     if (disabled) return;
     previousLink.current = hoveredLink;
     setHoveredLink(link);

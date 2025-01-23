@@ -10,6 +10,7 @@ import {
 import { MDSError, Success } from "../error";
 import { ConsolidationFormValues } from "@/lib/schemas";
 import { SplitFormValues } from "@/lib/schemas";
+import { addDecimalStrings } from "../utils";
 
 async function getBalance(): Promise<MDSResponse<Balance[]>> {
   const balance = await MDS.cmd.balance();
@@ -202,7 +203,8 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
 
   const TXN_ID =
     "manual-consolidation-" + Math.random().toString(36).substring(2, 15);
-  let totalAmount: number = 0;
+
+  let totalAmount = "0";
 
   if (coinIds.length === 0) {
     throw new Error("No coins to consolidate");
@@ -221,9 +223,11 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
       throw new Error("Error getting coin");
     }
 
-    totalAmount += parseFloat(
-      coinAmount.response[0].tokenamount || coinAmount.response[0].amount
-    );
+    const amount = coinAmount.response[0].amount;
+
+    console.log(amount);
+
+    totalAmount = addDecimalStrings(totalAmount, amount);
 
     const input = await MDS.cmd.txninput({
       params: {
@@ -258,7 +262,7 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
   const output = await MDS.cmd.txnoutput({
     params: {
       address: MxAddress,
-      amount: totalAmount.toString(),
+      amount: totalAmount,
       id: TXN_ID,
       tokenid: coin.response[0].tokenid,
     },

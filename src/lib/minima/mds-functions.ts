@@ -111,11 +111,8 @@ async function untrackCoin(
       await MDS.cmd.cointrack({
         params: { coinid: c.coinid, enable: track },
       });
-
-      console.log("UNTRACKED", c.coinid);
     }
   }
-  console.log("DONE");
   return null;
 }
 
@@ -224,8 +221,6 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
     }
 
     const amount = coinAmount.response[0].amount;
-
-    console.log(amount);
 
     totalAmount = addDecimalStrings(totalAmount, amount);
 

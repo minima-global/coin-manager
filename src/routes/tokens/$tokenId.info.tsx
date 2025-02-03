@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Coins, Wallet } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { CopyButton } from "@/components/copy-button";
 
 export const Route = createFileRoute("/tokens/$tokenId/info")({
   component: Info,
@@ -27,7 +28,7 @@ function Info() {
         const addressCoinsForToken = addrCoins?.response.filter(
           (coin) => coin.tokenid === tokenId
         );
-        
+
         const totalAmount =
           addressCoinsForToken?.reduce(
             (sum, coin) => sum + Number(coin.tokenamount || coin.amount),
@@ -68,9 +69,10 @@ function Info() {
 
       <div className="flex flex-col space-y-4 md:space-y-2 mb-6">
         <p className="text-sm md:text-xs text-muted-foreground">
-          View and manage coins for token {tokenId}. Toggle between all coins and spendable coins.
+          View and manage coins for token {tokenId}. Toggle between all coins
+          and spendable coins.
         </p>
-        
+
         <div className="flex items-center justify-start space-x-4 bg-grey10 dark:bg-darkContrast rounded-lg p-3">
           <Switch
             id="show-all-coins"
@@ -78,7 +80,10 @@ function Info() {
             onCheckedChange={setShowAllCoins}
             className="data-[state=checked]:bg-primary"
           />
-          <Label htmlFor="show-all-coins" className="text-sm flex items-center gap-2">
+          <Label
+            htmlFor="show-all-coins"
+            className="text-sm flex items-center gap-2"
+          >
             {showAllCoins ? (
               <>
                 <Coins className="h-4 w-4" />
@@ -96,7 +101,7 @@ function Info() {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={showAllCoins ? 'all' : 'spendable'}
+          key={showAllCoins ? "all" : "spendable"}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -112,7 +117,9 @@ function Info() {
                 <span className="text-sm md:text-xs text-muted-foreground">
                   Total amount across all addresses:
                 </span>
-                <span className="font-mono font-medium">{totalTokenAmount}</span>
+                <span className="font-mono font-medium">
+                  {totalTokenAmount}
+                </span>
               </div>
               <div className="grid grid-cols-[1fr,auto] gap-2 md:gap-1.5">
                 {addressesWithCoins.map(({ addr, totalAmount }) => (
@@ -144,9 +151,9 @@ function Info() {
                       hasCoins &&
                       setExpandedAddress(expandedAddress === addr ? null : addr)
                     }
-                    className={`w-full p-4 md:p-3 flex items-center justify-between ${hasCoins ? "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer" : "cursor-default"}`}
+                    className={`w-full p-4 md:p-3 flex flex-col ${hasCoins ? "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer" : "cursor-default"}`}
                   >
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start w-full">
                       <div className="flex items-center gap-2 md:gap-1.5">
                         <span className="font-medium text-primary py-[2px] px-2 dark:bg-[#18181b] bg-[#ebebeb] text-sm md:text-xs">
                           Address:
@@ -154,14 +161,34 @@ function Info() {
                         <span className="font-mono text-sm md:text-xs truncate">
                           {addr}
                         </span>
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <CopyButton
+                            onCopy={async () => {
+                              await navigator.clipboard.writeText(addr);
+                            }}
+                            className="h-7 px-2.5 text-xs"
+                            label="Copy Address"
+                          />
+                        </div>
                       </div>
-                      <div className="mt-2 md:mt-1.5 flex items-center gap-2 md:gap-1.5">
-                        <span className="font-medium text-primary py-[2px] px-2 dark:bg-[#18181b] bg-[#ebebeb] text-sm md:text-xs">
-                          Total Amount:
-                        </span>
-                        <span className="font-mono text-sm md:text-xs">
-                          {totalAmount}
-                        </span>
+                      <div className="mt-2 md:mt-1.5 flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2 md:gap-1.5">
+                          <span className="font-medium text-primary py-[2px] px-2 dark:bg-[#18181b] bg-[#ebebeb] text-sm md:text-xs">
+                            Total Amount:
+                          </span>
+                          <span className="font-mono text-sm md:text-xs">
+                            {totalAmount}
+                          </span>
+                        </div>
+                        {hasCoins && (
+                          <div className="flex items-center">
+                            {expandedAddress === addr ? (
+                              <ChevronUp className="w-5 h-5 md:w-4 md:h-4 text-gray-500" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 md:w-4 md:h-4 text-gray-500" />
+                            )}
+                          </div>
+                        )}
                       </div>
                       {!hasCoins && (
                         <p className="mt-2 md:mt-1.5 text-sm md:text-xs text-muted-foreground">
@@ -169,12 +196,6 @@ function Info() {
                         </p>
                       )}
                     </div>
-                    {hasCoins &&
-                      (expandedAddress === addr ? (
-                        <ChevronUp className="w-5 h-5 md:w-4 md:h-4 text-gray-500" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 md:w-4 md:h-4 text-gray-500" />
-                      ))}
                   </button>
 
                   <AnimatePresence>

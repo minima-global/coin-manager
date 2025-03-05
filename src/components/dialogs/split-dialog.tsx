@@ -219,11 +219,11 @@ export function SplitDialog({
                   mdsEventData?.uid !== splitData && (
                     <div className="flex flex-col gap-2 items-center justify-center ">
                       <p className="text-sm text-muted-foreground ">
-                        To complete the consolidation, go to the Pending
-                        MiniDapp and approve the command. That's it!
+                        To complete your split, go to the Pending MiniDapp and
+                        approve the command. That's it!
                         <br />
                         <br />
-                        Once approved, your coins will be consolidated.
+                        Once approved, your coins will be split.
                       </p>
                     </div>
                   )}

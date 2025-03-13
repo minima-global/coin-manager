@@ -23,8 +23,16 @@ export const addDecimalStrings = (a: string, b: string): string => {
 
   // Convert back to decimal string
   const sumAsString = sumAsInt.toString();
-  const wholePart = sumAsString.slice(0, -maxDecimalLength) || "0";
-  const decimalPart = sumAsString.slice(-maxDecimalLength);
 
-  return decimalPart ? `${wholePart}.${decimalPart}` : wholePart;
+  // Handle the decimal point correctly
+  if (maxDecimalLength > 0) {
+    // Need to ensure we have enough digits for the decimal part
+    const paddedSumString = sumAsString.padStart(maxDecimalLength + 1, "0");
+    const wholePart = paddedSumString.slice(0, -maxDecimalLength) || "0";
+    const decimalPart = paddedSumString.slice(-maxDecimalLength);
+    return `${wholePart}.${decimalPart}`;
+  } else {
+    // No decimal places
+    return sumAsString;
+  }
 };

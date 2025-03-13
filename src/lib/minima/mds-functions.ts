@@ -267,6 +267,32 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
     throw new Error("Error adding output");
   }
 
+  const check = await MDS.cmd.txncheck({
+    params: {
+      id: TXN_ID,
+    },
+  });
+
+  if (check.error) {
+    throw new Error("Invalid transaction");
+  }
+
+  if (check.response.burn !== "0") {
+    throw new Error("Invalid transaction");
+  }
+
+  // @ts-ignore
+  if (check.response.coins[0].difference !== "0") {
+    throw new Error("Input and output amounts do not match");
+  }
+
+  // @ts-ignore
+  const checkCoins = check.response.coins[0];
+
+  if (checkCoins.input !== checkCoins.output) {
+    throw new Error("Input and output amounts do not match");
+  }
+
   const post = await MDS.cmd.txnsign({
     params: {
       id: TXN_ID,
@@ -281,7 +307,7 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
     return Success(pendingId);
   }
 
-  return Success(post);
+  return Success("123");
 }
 
 async function splitCoins(values: SplitFormValues): Promise<any> {

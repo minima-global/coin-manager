@@ -56,6 +56,7 @@ export function ConsolidationContent({ disabled }: ConsolidationContentProps) {
     onSuccess: async (responseData) => {
       await new Promise((resolve) => setTimeout(resolve, 5000));
       setConsolidationData(responseData.data);
+      form.reset();
     },
     onError: (error) => {
       if (error instanceof MDSError && error.error_tag === "txpow_to_big") {
@@ -186,6 +187,7 @@ export function ManualConsolidationContent({
     onSuccess: async (responseData) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setConsolidationData(responseData.data);
+      form.reset();
     },
     onError: (error) => {
       console.error(error);

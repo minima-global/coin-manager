@@ -42,6 +42,7 @@ export function Split({ disabled }: { disabled: boolean }) {
     onSuccess: async (data) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setSplitData(data.data);
+      form.reset();
     },
     onError: (error) => {
       if (error instanceof MDSError && error.error_tag === "txpow_to_big") {

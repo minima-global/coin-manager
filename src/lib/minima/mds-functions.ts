@@ -10,6 +10,7 @@ import {
 import { MDSError, Success } from "../error";
 import { ConsolidationFormValues } from "@/lib/schemas";
 import { SplitFormValues } from "@/lib/schemas";
+import { addDecimalStrings } from "../utils";
 
 async function getBalance(): Promise<MDSResponse<Balance[]>> {
   const balance = await MDS.cmd.balance();
@@ -37,7 +38,7 @@ async function getAddresses(
 ): Promise<Record<string, MDSResponse<Coin[]> | null>> {
   const addressCoins: Record<string, MDSResponse<Coin[]> | null> = {};
   const res = await MDS.cmd.scripts();
-  
+
   if (!res.status) {
     return addressCoins;
   }
@@ -64,13 +65,13 @@ async function getAddresses(
       const addressMatches = coins.response.filter(
         (coin) => coin.miniaddress === addr
       );
-      
+
       if (addressMatches.length > 0) {
         addressCoins[addr] = {
           ...coins,
           status: true,
           response: addressMatches,
-          pending: false
+          pending: false,
         };
       } else {
         addressCoins[addr] = null;
@@ -95,14 +96,17 @@ async function getAddresses(
     }
 
     // Group coins by miniaddress
-    const addressGroups = coins.response.reduce((groups, coin) => {
-      const addr = coin.miniaddress;
-      if (!groups[addr]) {
-        groups[addr] = [];
-      }
-      groups[addr].push(coin);
-      return groups;
-    }, {} as Record<string, Coin[]>);
+    const addressGroups = coins.response.reduce(
+      (groups, coin) => {
+        const addr = coin.miniaddress;
+        if (!groups[addr]) {
+          groups[addr] = [];
+        }
+        groups[addr].push(coin);
+        return groups;
+      },
+      {} as Record<string, Coin[]>
+    );
 
     // Convert groups to MDSResponse format, this will include both simple addresses and any additional addresses
     Object.entries(addressGroups).forEach(([addr, addrCoins]) => {
@@ -110,7 +114,7 @@ async function getAddresses(
         ...coins,
         status: true,
         response: addrCoins,
-        pending: false
+        pending: false,
       };
     });
   }
@@ -258,7 +262,8 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
 
   const TXN_ID =
     "manual-consolidation-" + Math.random().toString(36).substring(2, 15);
-  let totalAmount: number = 0;
+
+  let totalAmount = "0";
 
   if (coinIds.length === 0) {
     throw new Error("No coins to consolidate");
@@ -277,9 +282,9 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
       throw new Error("Error getting coin");
     }
 
-    totalAmount += parseFloat(
-      coinAmount.response[0].tokenamount || coinAmount.response[0].amount
-    );
+    const amount = coinAmount.response[0].amount;
+
+    totalAmount = addDecimalStrings(totalAmount, amount);
 
     const input = await MDS.cmd.txninput({
       params: {
@@ -314,7 +319,7 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
   const output = await MDS.cmd.txnoutput({
     params: {
       address: MxAddress,
-      amount: totalAmount.toString(),
+      amount: totalAmount,
       id: TXN_ID,
       tokenid: coin.response[0].tokenid,
     },
@@ -322,6 +327,32 @@ async function manualConsolidation(coinIds: string[]): Promise<any> {
 
   if (output.error) {
     throw new Error("Error adding output");
+  }
+
+  const check = await MDS.cmd.txncheck({
+    params: {
+      id: TXN_ID,
+    },
+  });
+
+  if (check.error) {
+    throw new Error("Invalid transaction");
+  }
+
+  if (check.response.burn !== "0") {
+    throw new Error("Invalid transaction");
+  }
+
+  // @ts-ignore
+  if (check.response.coins[0].difference !== "0") {
+    throw new Error("Input and output amounts do not match");
+  }
+
+  // @ts-ignore
+  const checkCoins = check.response.coins[0];
+
+  if (checkCoins.input !== checkCoins.output) {
+    throw new Error("Input and output amounts do not match");
   }
 
   const post = await MDS.cmd.txnsign({
